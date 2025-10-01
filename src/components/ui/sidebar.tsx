@@ -265,7 +265,7 @@ SidebarInset.displayName = "SidebarInset"
 const SidebarInput = React.forwardRef<
   React.ElementRef<typeof Input>,
   React.ComponentProps<typeof Input>
->(({ className, ...props }, ref) => {
+>(({ className, children, ...props }, ref) => {
     const { state } = useSidebar();
   return (
     <div className="relative">
@@ -288,7 +288,7 @@ const SidebarInput = React.forwardRef<
             state === 'collapsed' ? 'peer-focus/menu-button:bg-red-500' : ''
         )}
        >
-         {props.children}
+         {children}
       </div>
     </div>
   )

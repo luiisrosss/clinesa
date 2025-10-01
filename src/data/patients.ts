@@ -29,7 +29,7 @@ const initialPatients: Patient[] = [
 
 
 export const getPatients = (): Patient[] => {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return initialPatients; // Return initial for SSR or build
   try {
     const patients = localStorage.getItem(PATIENTS_KEY);
     if (patients) {

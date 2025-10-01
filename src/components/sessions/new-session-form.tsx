@@ -12,68 +12,27 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { NewPatientForm } from "@/components/patients/new-patient-form";
 
-function NewPatientModal({ open, onOpenChange, onPatientCreated }: { open: boolean, onOpenChange: (open: boolean) => void, onPatientCreated: (patient: Patient) => void }) {
-  const { toast } = useToast();
-  const [name, setName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [reasonForConsultation, setReasonForConsultation] = useState("");
+function NewPatientModal({ open, onOpenChange, onPatientCreated }: { open: boolean, onOpenChange: (open: boolean) => void, onPatientCreated: (patientId: string) => void }) {
   
-  const handleSavePatient = () => {
-    if (!name || !lastName || !phone || !email || !reasonForConsultation) {
-       toast({ title: "Error", description: "Por favor, completa todos los campos.", variant: "destructive" });
-       return;
-    }
-    const newPatient: Patient = {
-        id: crypto.randomUUID(),
-        name,
-        lastName,
-        phone,
-        email,
-        reasonForConsultation,
-        registrationDate: new Date().toISOString(),
-    };
-    savePatient(newPatient);
-    onPatientCreated(newPatient);
+  // This modal now re-uses the full NewPatientForm.
+  // We can't directly get the new patient object back from the form.
+  // Instead, we just close the modal and expect the parent component to refetch patients.
+  const handleModalClose = (patientId?: string) => {
     onOpenChange(false);
-    toast({ title: "Éxito", description: "Nuevo paciente creado y seleccionado."});
-  };
+    if(patientId) {
+      onPatientCreated(patientId);
+    }
+  }
 
+  // This is a simplified version, as the full form handles its own logic.
+  // We just need a way to close the modal and refresh the patient list.
+  // A better implementation might use a global state manager.
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Crear Nuevo Paciente</DialogTitle>
-          <DialogDescription>Añade un nuevo paciente y se seleccionará automáticamente para esta sesión.</DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-           <div className="space-y-2">
-              <Label htmlFor="new-patient-name">Nombre</Label>
-              <Input id="new-patient-name" value={name} onChange={e => setName(e.target.value)} />
-           </div>
-           <div className="space-y-2">
-              <Label htmlFor="new-patient-lastName">Apellidos</Label>
-              <Input id="new-patient-lastName" value={lastName} onChange={e => setLastName(e.target.value)} />
-           </div>
-            <div className="space-y-2">
-              <Label htmlFor="new-patient-phone">Teléfono</Label>
-              <Input id="new-patient-phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} />
-           </div>
-            <div className="space-y-2">
-              <Label htmlFor="new-patient-email">Email</Label>
-              <Input id="new-patient-email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-           </div>
-            <div className="space-y-2">
-              <Label htmlFor="new-patient-reason">Motivo de Consulta</Label>
-              <Input id="new-patient-reason" value={reasonForConsultation} onChange={e => setReasonForConsultation(e.target.value)} />
-           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleSavePatient}>Guardar Paciente</Button>
-        </DialogFooter>
+      <DialogContent className="max-w-3xl">
+        <NewPatientForm />
       </DialogContent>
     </Dialog>
   )
@@ -89,13 +48,17 @@ export function NewSessionForm() {
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
 
   useEffect(() => {
-    setPatients(getPatients());
-  }, []);
+    // Fetch patients on mount and whenever the modal is closed
+    const allPatients = getPatients();
+    setPatients(allPatients);
+  }, [isPatientModalOpen]); // Re-fetch when modal closes
 
-  const handlePatientCreated = (newPatient: Patient) => {
-    const updatedPatients = [...patients, newPatient];
-    setPatients(updatedPatients);
-    setSelectedPatientId(newPatient.id);
+  const handlePatientCreated = (newPatientId: string) => {
+    const allPatients = getPatients();
+    setPatients(allPatients);
+    setSelectedPatientId(newPatientId);
+    setIsPatientModalOpen(false);
+    toast({ title: "Éxito", description: "Nuevo paciente creado y seleccionado."});
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -115,7 +78,7 @@ export function NewSessionForm() {
       id: crypto.randomUUID(),
       patientId: patient.id,
       patientName: `${patient.name} ${patient.lastName}`,
-      professionalId: "prof1", // Placeholder
+      professionalId: patient.assignedProfessional || "prof1",
       sessionDate: new Date(sessionDate).toISOString(),
       duration,
     };
@@ -141,9 +104,9 @@ export function NewSessionForm() {
               <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                      <Label htmlFor="patient">Paciente</Label>
+                      <Label htmlFor="patient">Paciente *</Label>
                       <div className="flex gap-2">
-                        <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+                        <Select value={selectedPatientId} onValueChange={setSelectedPatientId} required>
                           <SelectTrigger id="patient">
                               <SelectValue placeholder="Selecciona un paciente" />
                           </SelectTrigger>
@@ -158,7 +121,7 @@ export function NewSessionForm() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="sessionDate">Fecha de la Sesión</Label>
+                        <Label htmlFor="sessionDate">Fecha de la Sesión *</Label>
                         <Input
                         id="sessionDate"
                         type="date"
@@ -168,7 +131,7 @@ export function NewSessionForm() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="duration">Duración (minutos)</Label>
+                        <Label htmlFor="duration">Duración (minutos) *</Label>
                         <Input
                         id="duration"
                         type="number"
@@ -184,7 +147,17 @@ export function NewSessionForm() {
               </CardContent>
           </Card>
       </div>
-      <NewPatientModal open={isPatientModalOpen} onOpenChange={setIsPatientModalOpen} onPatientCreated={handlePatientCreated} />
+      
+      {/* 
+        This is a bit of a workaround. Ideally, the NewPatientForm would be a more reusable
+        component that could signal its completion. For now, we just show it in a modal
+        and refetch patients when the modal closes.
+      */}
+      <Dialog open={isPatientModalOpen} onOpenChange={setIsPatientModalOpen}>
+        <DialogContent className="max-w-3xl">
+           <NewPatientForm />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

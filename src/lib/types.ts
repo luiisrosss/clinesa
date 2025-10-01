@@ -5,29 +5,25 @@ export interface Patient {
   name: string;
   lastName: string;
   birthDate?: string;
-  gender?: string;
-  idDocument?: string;
+  alias?: string;
   phone: string;
   email: string;
-  address?: string;
-  contactPreference?: 'phone' | 'email' | 'sms';
-  emergencyContactName?: string;
-  emergencyContactRelation?: string;
-  emergencyContactPhone?: string;
-  registrationDate: string; // Fecha de alta
-  referralSource?: string;
-  insuranceProvider?: string;
-  medicalHistoryNumber?: string;
+  contactPreference?: 'phone' | 'email';
+  
+  // RGPD/Consentimientos
+  consentDataProcessing?: { accepted: boolean; date: string; documentVersion: string };
+  consentReminders?: { accepted: boolean; date: string; };
+  legalRepresentative?: { name: string; relation: string; };
+
+  // Clínico
   reasonForConsultation: string;
   currentRisk?: 'none' | 'low' | 'medium' | 'high';
   allergies?: string;
-  currentMedication?: string;
-  // RGPD/Consentimientos
-  consentDataProcessing?: { accepted: boolean; date: string; documentVersion: string };
-  consentSensitiveData?: { accepted: boolean; date: string; };
-  consentElectronicCommunications?: { accepted: boolean; date: string; };
-  legalBasis?: string;
-  legalRepresentative?: { name: string; relation: string; id: string };
+
+  // Administrativo
+  assignedProfessional?: string;
+  registrationDate: string; // Fecha de alta
+  referralSource?: string;
 }
 
 export interface Session {

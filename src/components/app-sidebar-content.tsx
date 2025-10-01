@@ -15,8 +15,9 @@ import {
   SidebarSeparator,
   SidebarFooter,
   SidebarMenuLabel,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { Home, Users, PlusCircle, ClipboardList, CalendarDays, Settings, LifeBuoy } from "lucide-react";
+import { Home, Users, PlusCircle, ClipboardList, CalendarDays, Settings, LifeBuoy, BrainCircuit } from "lucide-react";
 
 
 const navItems = [
@@ -34,11 +35,18 @@ const secondaryNavItems = [
 export default function AppSidebarContent() {
   const pathname = usePathname();
   const [isNewEntryDialogOpen, setIsNewEntryDialogOpen] = useState(false);
+  const { state: sidebarState } = useSidebar();
+
 
   return (
     <>
       <SidebarHeader>
-        <AppLogo />
+        <div className="flex items-center gap-2">
+            <BrainCircuit className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold font-headline text-foreground transition-opacity duration-100 group-data-[state=collapsed]/sidebar-wrapper:opacity-0">
+                Clinesa
+            </h1>
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -47,7 +55,7 @@ export default function AppSidebarContent() {
                 <SidebarSearch />
             </SidebarMenuItem>
              <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setIsNewEntryDialogOpen(true)}>
+                <SidebarMenuButton onClick={() => setIsNewEntryDialogOpen(true)} tooltip="Nueva Nota">
                     <PlusCircle />
                     <SidebarMenuLabel>Nueva Nota</SidebarMenuLabel>
                 </SidebarMenuButton>

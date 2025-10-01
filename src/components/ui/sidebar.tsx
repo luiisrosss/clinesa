@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, Search } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -145,6 +145,7 @@ const SidebarProvider = React.forwardRef<
             )}
             ref={ref}
             {...props}
+            data-state={state}
           >
             {children}
           </div>
@@ -203,7 +204,7 @@ const Sidebar = React.forwardRef<
           className={cn(
             "duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] flex-col border-sidebar-border bg-sidebar transition-[width] ease-in-out md:flex",
             side === "left" ? "border-r" : "border-l",
-            "group-data-[state=collapsed]/sidebar:w-[--sidebar-width-icon]",
+            "group-data-[state=collapsed]/sidebar-wrapper:w-[--sidebar-width-icon]",
             className
           )}
           {...props}
@@ -252,7 +253,7 @@ const SidebarInset = React.forwardRef<
       className={cn(
         "relative flex min-h-svh flex-1 flex-col bg-background transition-[margin-left] duration-200 ease-in-out",
         "md:ml-[--sidebar-width]",
-        "peer-data-[state=collapsed]/sidebar:md:ml-[--sidebar-width-icon]",
+        "group-data-[state=collapsed]/sidebar-wrapper:md:ml-[--sidebar-width-icon]",
         className
       )}
       {...props}
@@ -262,14 +263,22 @@ const SidebarInset = React.forwardRef<
 SidebarInset.displayName = "SidebarInset"
 
 const SidebarInput = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> & {
-    placeholder?: string
-  }
->(({ className, children, ...props }, ref) => {
+  HTMLInputElement,
+  React.ComponentProps<typeof Input>
+>(({ className, ...props }, ref) => {
+  const { state } = useSidebar();
   return (
-    <div ref={ref} className={cn("relative", className)} {...props}>
-      {children}
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Input
+        ref={ref}
+        className={cn(
+          "h-9 pl-9 transition-all",
+          state === 'collapsed' && "w-0 opacity-0",
+          className
+        )}
+        {...props}
+      />
     </div>
   )
 })
@@ -313,7 +322,7 @@ const SidebarSeparator = React.forwardRef<
     <Separator
       ref={ref}
       data-sidebar="separator"
-      className={cn("mx-3 my-2 w-auto bg-sidebar-border transition-all group-data-[state=collapsed]/sidebar:mx-auto group-data-[state=collapsed]/sidebar:w-3/4", className)}
+      className={cn("mx-3 my-2 w-auto bg-sidebar-border transition-all group-data-[state=collapsed]/sidebar-wrapper:mx-auto group-data-[state=collapsed]/sidebar-wrapper:w-3/4", className)}
       {...props}
     />
   )
@@ -365,7 +374,7 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-2 group-data-[state=collapsed]/sidebar:py-2",
+  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[state=collapsed]/sidebar-wrapper:justify-center group-data-[state=collapsed]/sidebar-wrapper:px-2 group-data-[state=collapsed]/sidebar-wrapper:py-2",
   {
     variants: {
       variant: {
@@ -408,16 +417,14 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
-    
-    const buttonSize = state === 'collapsed' ? 'icon' : size;
 
     const button = (
       <Comp
         ref={ref}
         data-sidebar="menu-button"
-        data-size={buttonSize}
+        data-size={size}
         data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size: buttonSize }), className)}
+        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
       >
         {children}
@@ -457,7 +464,7 @@ const SidebarMenuLabel = React.forwardRef<
         <span
             ref={ref}
             className={cn(
-                "truncate transition-opacity duration-100 group-data-[state=collapsed]/sidebar:opacity-0",
+                "truncate transition-opacity duration-100 group-data-[state=collapsed]/sidebar-wrapper:opacity-0",
                 className
             )}
             {...props}

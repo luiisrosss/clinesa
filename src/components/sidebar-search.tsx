@@ -62,17 +62,15 @@ export function SidebarSearch() {
   const hasMorePatients = filteredPatients.length > 3;
 
   return (
-    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-        <PopoverTrigger asChild>
-             <SidebarInput
-                placeholder="Buscar cliente..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onFocus={() => { if(searchTerm) setIsPopoverOpen(true)}}
-            >
-                <Search className="h-4 w-4 text-muted-foreground" />
-             </SidebarInput>
-        </PopoverTrigger>
+    <Popover open={isPopoverOpen && sidebarState === 'expanded'} onOpenChange={setIsPopoverOpen}>
+      <PopoverTrigger asChild>
+        <SidebarInput
+          placeholder="Buscar cliente..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onFocus={() => { if(searchTerm && sidebarState === 'expanded') setIsPopoverOpen(true)}}
+        />
+      </PopoverTrigger>
       <PopoverContent className="w-[240px] p-0" align="start" side="right">
         <div className="divide-y divide-border rounded-lg bg-card">
             {displayedPatients.length > 0 ? (

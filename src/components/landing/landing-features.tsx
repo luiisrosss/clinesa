@@ -26,24 +26,24 @@ export function LandingFeatures() {
 
   const benefits = [
     {
-      icon: <Clock className="h-8 w-8 text-green-500" />,
+      icon: <Clock className="h-8 w-8 text-primary" />,
       title: "Ahorra Horas de Trabajo",
       description: "Reduce drásticamente el tiempo dedicado a tareas administrativas y de documentación."
     },
     {
-      icon: <Zap className="h-8 w-8 text-yellow-500" />,
+      icon: <Zap className="h-8 w-8 text-primary" />,
       title: "Enfócate en tus Pacientes",
       description: "Libera tu mente del papeleo y dedica tu energía a lo que mejor sabes hacer: la terapia."
     },
     {
-      icon: <FileText className="h-8 w-8 text-blue-500" />,
+      icon: <FileText className="h-8 w-8 text-primary" />,
       title: "Mejora la Calidad de tus Notas",
       description: "Genera notas de sesión más completas, objetivas y consistentes con la ayuda de la IA."
     }
   ]
 
   return (
-    <section id="features" className="py-20 bg-white dark:bg-gray-900/50">
+    <section id="features" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Features */}
         <div className="text-center mb-16">

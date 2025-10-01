@@ -23,7 +23,7 @@ export function LandingTestimonials() {
   ];
 
   return (
-    <section id="testimonials" className="py-20 bg-white dark:bg-gray-900/50">
+    <section id="testimonials" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold font-headline">Lo que Dicen los Profesionales</h2>

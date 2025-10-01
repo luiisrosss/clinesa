@@ -50,7 +50,7 @@ export function LandingPricing() {
   ];
 
   return (
-    <section id="pricing" className="py-20 bg-primary/5">
+    <section id="pricing" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold font-headline">Un Plan para Cada Necesidad</h2>
@@ -69,7 +69,7 @@ export function LandingPricing() {
               <ul className="space-y-4 mb-8 flex-grow">
                 {plan.features.map((feature, fIndex) => (
                   <li key={fIndex} className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <CheckCircle className="h-5 w-5 text-primary" />
                     <span>{feature}</span>
                   </li>
                 ))}

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { NewPatientForm } from "@/components/patients/new-patient-form";
 import { format } from "date-fns";
 
@@ -81,15 +81,14 @@ export function NewSessionForm({ initialDate, onSessionCreated }: NewSessionForm
 
   return (
     <>
-      <div className="p-6">
+      <div className="p-6 pt-0">
           <Card className="max-w-2xl mx-auto border-0 shadow-none">
-              <CardHeader>
-                  <CardTitle>Crear Nueva Sesión</CardTitle>
+              <CardHeader className="p-0 mb-6 text-left">
                   <CardDescription>
                   Introduce los detalles de la nueva sesión.
                   </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                   <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
                       <Label htmlFor="patient">Cliente *</Label>
@@ -148,6 +147,12 @@ export function NewSessionForm({ initialDate, onSessionCreated }: NewSessionForm
       
       <Dialog open={isPatientModalOpen} onOpenChange={setIsPatientModalOpen}>
         <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Crear Nuevo Cliente</DialogTitle>
+            <DialogDescription>
+              Añade un nuevo cliente a tus registros.
+            </DialogDescription>
+          </DialogHeader>
            <NewPatientForm />
         </DialogContent>
       </Dialog>

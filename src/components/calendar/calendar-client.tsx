@@ -11,7 +11,7 @@ import { MonthView } from "@/components/calendar/month-view";
 import { WeekView } from "@/components/calendar/week-view";
 import { DayView } from "@/components/calendar/day-view";
 import { NewSessionForm } from "@/components/sessions/new-session-form";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type View = "month" | "week" | "day";
 
@@ -111,6 +111,9 @@ export function CalendarClient() {
 
       <Dialog open={isNewSessionModalOpen} onOpenChange={setIsNewSessionModalOpen}>
         <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Crear Nueva Sesión</DialogTitle>
+          </DialogHeader>
           <NewSessionForm
             initialDate={newSessionDate}
             onSessionCreated={handleSessionCreated}

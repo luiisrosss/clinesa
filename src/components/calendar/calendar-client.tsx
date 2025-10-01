@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getSessions } from "@/data/sessions";
 import type { Patient, Session } from "@/lib/types";
-import { add, sub, format } from "date-fns";
+import { add, sub, format, startOfWeek, endOfWeek } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";

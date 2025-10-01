@@ -1,7 +1,7 @@
 "use client";
 
 import type { Session } from "@/lib/types";
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isToday, setHours, setMinutes } from "date-fns";
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isToday, setHours, setMinutes, add } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
 import { cn } from "@/lib/utils";

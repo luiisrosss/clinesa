@@ -1,7 +1,7 @@
 "use client";
 
 import type { Session } from "@/lib/types";
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, getHours, getMinutes, isToday, addHours } from 'date-fns';
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, getHours, getMinutes, isToday, addHours, add, setHours, setMinutes } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,11 +10,12 @@ import { cn } from "@/lib/utils";
 type WeekViewProps = {
   date: Date;
   sessions: Session[];
+  onSlotClick: (date: Date) => void;
 };
 
-export function WeekView({ date, sessions }: WeekViewProps) {
-  const weekStart = startOfWeek(date, { locale: es });
-  const weekEnd = endOfWeek(date, { locale: es });
+export function WeekView({ date, sessions, onSlotClick }: WeekViewProps) {
+  const weekStart = add(startOfWeek(date, { locale: es }), {days: 1});
+  const weekEnd = add(endOfWeek(date, { locale: es }), {days: 1});
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -29,6 +30,11 @@ export function WeekView({ date, sessions }: WeekViewProps) {
 
     return { top, height };
   };
+
+  const handleSlotClick = (day: Date, hour: number) => {
+    const clickedDate = setMinutes(setHours(day, hour), 0);
+    onSlotClick(clickedDate);
+  }
 
   return (
     <div className="flex-1 flex flex-col">
@@ -62,18 +68,28 @@ export function WeekView({ date, sessions }: WeekViewProps) {
                 <div key={`line-${hour}-${day.toISOString()}`} className="h-[60px] border-b" />
               ))}
 
+               {/* Empty slot creator */}
+              {hours.map(hour => (
+                <div 
+                  key={`slot-${hour}-${day.toISOString()}`}
+                  className="h-[60px] absolute w-full cursor-pointer" 
+                  style={{ top: `${hour * 60}px` }}
+                  onClick={() => handleSlotClick(day, hour)}
+                />
+              ))}
+
               {/* Session Blocks */}
               {sessionsForDay.map(session => {
                 const { top, height } = getPositionAndHeight(session);
                 return (
-                  <Link key={session.id} href={`/sessions/${session.id}`} className="absolute w-full pr-1">
+                  <Link key={session.id} href={`/sessions/${session.id}`} className="absolute w-full pr-1 z-10" onClick={(e) => e.stopPropagation()}>
                     <Card 
-                      className="absolute w-full bg-primary/20 border-l-2 border-primary hover:bg-primary/30 cursor-pointer"
+                      className="absolute w-full bg-primary text-primary-foreground border-l-2 border-primary-foreground hover:bg-primary/90 cursor-pointer"
                       style={{ top: `${top}px`, height: `${height}px`, left: '0', right: '0' }}
                     >
                       <CardHeader className="p-1">
                         <CardTitle className="text-xs font-semibold truncate">{session.patientName}</CardTitle>
-                        <CardDescription className="text-xs">{format(new Date(session.sessionDate), "p", { locale: es })}</CardDescription>
+                        <CardDescription className="text-xs text-primary-foreground/80">{format(new Date(session.sessionDate), "p", { locale: es })}</CardDescription>
                       </CardHeader>
                     </Card>
                   </Link>

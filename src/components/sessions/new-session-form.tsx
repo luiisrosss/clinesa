@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { saveSession } from "@/data/sessions";
-import { getPatients, savePatient } from "@/data/patients";
+import { getPatients } from "@/data/patients";
 import type { Session, Patient } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,55 +11,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
 import { NewPatientForm } from "@/components/patients/new-patient-form";
+import { format } from "date-fns";
 
-function NewPatientModal({ open, onOpenChange, onPatientCreated }: { open: boolean, onOpenChange: (open: boolean) => void, onPatientCreated: (patientId: string) => void }) {
-  
-  // This modal now re-uses the full NewPatientForm.
-  // We can't directly get the new patient object back from the form.
-  // Instead, we just close the modal and expect the parent component to refetch patients.
-  const handleModalClose = (patientId?: string) => {
-    onOpenChange(false);
-    if(patientId) {
-      onPatientCreated(patientId);
-    }
-  }
-
-  // This is a simplified version, as the full form handles its own logic.
-  // We just need a way to close the modal and refresh the patient list.
-  // A better implementation might use a global state manager.
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
-        <NewPatientForm />
-      </DialogContent>
-    </Dialog>
-  )
+type NewSessionFormProps = {
+  initialDate?: Date;
+  onSessionCreated?: () => void;
 }
 
-export function NewSessionForm() {
+export function NewSessionForm({ initialDate, onSessionCreated }: NewSessionFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState<string>("");
-  const [sessionDate, setSessionDate] = useState(new Date().toISOString().split('T')[0]);
+  const [sessionDate, setSessionDate] = useState(format(initialDate || new Date(), "yyyy-MM-dd'T'HH:mm"));
   const [duration, setDuration] = useState(50);
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
 
   useEffect(() => {
-    // Fetch patients on mount and whenever the modal is closed
     const allPatients = getPatients();
     setPatients(allPatients);
-  }, [isPatientModalOpen]); // Re-fetch when modal closes
+  }, [isPatientModalOpen]);
 
-  const handlePatientCreated = (newPatientId: string) => {
-    const allPatients = getPatients();
-    setPatients(allPatients);
-    setSelectedPatientId(newPatientId);
-    setIsPatientModalOpen(false);
-    toast({ title: "Éxito", description: "Nuevo cliente creado y seleccionado."});
-  }
+  useEffect(() => {
+    if (initialDate) {
+      setSessionDate(format(initialDate, "yyyy-MM-dd'T'HH:mm"));
+    }
+  }, [initialDate]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,13 +68,21 @@ export function NewSessionForm() {
       title: "Éxito",
       description: "Nueva sesión creada.",
     });
-    router.push(`/sessions/${newSession.id}`);
+
+    if (onSessionCreated) {
+      onSessionCreated();
+    } else {
+      router.push(`/sessions/${newSession.id}`);
+    }
   };
+  
+  const justDate = sessionDate.split('T')[0];
+  const justTime = sessionDate.split('T')[1];
 
   return (
     <>
       <div className="p-6">
-          <Card className="max-w-2xl mx-auto">
+          <Card className="max-w-2xl mx-auto border-0 shadow-none">
               <CardHeader>
                   <CardTitle>Crear Nueva Sesión</CardTitle>
                   <CardDescription>
@@ -123,11 +111,21 @@ export function NewSessionForm() {
                     <div className="space-y-2">
                         <Label htmlFor="sessionDate">Fecha de la Sesión *</Label>
                         <Input
-                        id="sessionDate"
-                        type="date"
-                        value={sessionDate}
-                        onChange={(e) => setSessionDate(e.target.value)}
-                        required
+                          id="sessionDate"
+                          type="date"
+                          value={justDate}
+                          onChange={(e) => setSessionDate(`${e.target.value}T${justTime}`)}
+                          required
+                        />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="sessionTime">Hora de la Sesión *</Label>
+                        <Input
+                          id="sessionTime"
+                          type="time"
+                          value={justTime}
+                          onChange={(e) => setSessionDate(`${justDate}T${e.target.value}`)}
+                          required
                         />
                     </div>
                     <div className="space-y-2">
@@ -148,11 +146,6 @@ export function NewSessionForm() {
           </Card>
       </div>
       
-      {/* 
-        This is a bit of a workaround. Ideally, the NewPatientForm would be a more reusable
-        component that could signal its completion. For now, we just show it in a modal
-        and refetch patients when the modal closes.
-      */}
       <Dialog open={isPatientModalOpen} onOpenChange={setIsPatientModalOpen}>
         <DialogContent className="max-w-3xl">
            <NewPatientForm />

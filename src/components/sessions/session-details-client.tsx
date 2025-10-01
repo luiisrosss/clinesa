@@ -46,13 +46,8 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
     });
   };
   
-  const updateNotes = (noteType: 'subjective' | 'objective' | 'analysis' | 'plan', value: string) => {
-    updateSession({
-        notes: {
-            ...session?.notes,
-            [noteType]: value,
-        }
-    })
+  const updateNotes = (value: string) => {
+    updateSession({ notes: value })
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,36 +121,11 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
         
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><StickyNote /> Notas SOAP</CardTitle>
-            <CardDescription>Documenta la sesión siguiendo el método SOAP.</CardDescription>
+            <CardTitle className="flex items-center gap-2"><StickyNote /> Notas de la Sesión</CardTitle>
+            <CardDescription>Añade tus notas y observaciones de la sesión.</CardDescription>
           </CardHeader>
           <CardContent>
-             <Accordion type="single" collapsible className="w-full" defaultValue="subjective">
-                <AccordionItem value="subjective">
-                  <AccordionTrigger>S (Subjetivo)</AccordionTrigger>
-                  <AccordionContent>
-                    <Textarea value={session.notes?.subjective} onChange={e => updateNotes('subjective', e.target.value)} placeholder="Lo que el paciente expresa..." rows={5}/>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="objective">
-                  <AccordionTrigger>O (Objetivo)</AccordionTrigger>
-                  <AccordionContent>
-                    <Textarea value={session.notes?.objective} onChange={e => updateNotes('objective', e.target.value)} placeholder="Observaciones objetivas y medibles..." rows={5}/>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="analysis">
-                  <AccordionTrigger>A (Análisis)</AccordionTrigger>
-                  <AccordionContent>
-                    <Textarea value={session.notes?.analysis} onChange={e => updateNotes('analysis', e.target.value)} placeholder="Tu interpretación clínica..." rows={5}/>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="plan">
-                  <AccordionTrigger>P (Plan)</AccordionTrigger>
-                  <AccordionContent>
-                    <Textarea value={session.notes?.plan} onChange={e => updateNotes('plan', e.target.value)} placeholder="Próximos pasos, tareas, etc." rows={5}/>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+             <Textarea value={session.notes} onChange={e => updateNotes(e.target.value)} placeholder="Escribe tus notas aquí..." rows={10}/>
           </CardContent>
         </Card>
 

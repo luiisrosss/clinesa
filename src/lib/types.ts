@@ -33,12 +33,7 @@ export interface Session {
   professionalId: string; // Asumimos un profesional por ahora
   sessionDate: string; // fecha_hora
   duration: number; // duracion_min
-  notes?: {
-    subjective?: string; // S_subjetivo / D_descripcion
-    objective?: string; // O_objetivo
-    analysis?: string; // A_analisis
-    plan?: string; // P_plan
-  };
+  notes?: string;
   treatmentGoals?: string[];
   goalStatus?: 'not_started' | 'in_progress' | 'achieved';
   riskScreening?: 'none' | 'low' | 'medium' | 'high';

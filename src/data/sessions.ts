@@ -12,12 +12,7 @@ const initialSessions: Session[] = [
       professionalId: "prof1",
       sessionDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
       duration: 50,
-      notes: {
-        subjective: "Patient reports feeling less anxious this week.",
-        objective: "Appeared calm and engaged during the session.",
-        analysis: "Progressing well with anxiety management techniques.",
-        plan: "Continue with mindfulness exercises and introduce thought records.",
-      }
+      notes: "Patient reports feeling less anxious this week. Appeared calm and engaged during the session. Progressing well with anxiety management techniques. Continue with mindfulness exercises and introduce thought records.",
     },
     {
       id: "2",

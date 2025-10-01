@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
@@ -263,33 +262,14 @@ const SidebarInset = React.forwardRef<
 SidebarInset.displayName = "SidebarInset"
 
 const SidebarInput = React.forwardRef<
-  React.ElementRef<typeof Input>,
-  React.ComponentProps<typeof Input>
+  HTMLDivElement,
+  React.ComponentProps<"div"> & {
+    placeholder?: string
+  }
 >(({ className, children, ...props }, ref) => {
-    const { state } = useSidebar();
   return (
-    <div className="relative">
-      <Input
-        ref={ref}
-        data-sidebar="input"
-        className={cn(
-          "h-9 w-full bg-sidebar-accent shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring transition-all",
-          "group-data-[state=collapsed]/sidebar:w-0 group-data-[state=collapsed]/sidebar:px-0",
-          className
-        )}
-        {...props}
-      />
-      <div 
-        className={cn(
-            "absolute left-0 top-0 h-9 w-9 flex items-center justify-center transition-all",
-            "group-data-[state=expanded]/sidebar:w-9",
-            "group-data-[state=collapsed]/sidebar:w-full group-data-[state=collapsed]/sidebar:bg-sidebar-accent group-data-[state=collapsed]/sidebar:rounded-md",
-            "cursor-pointer",
-            state === 'collapsed' ? 'peer-focus/menu-button:bg-red-500' : ''
-        )}
-       >
-         {children}
-      </div>
+    <div ref={ref} className={cn("relative", className)} {...props}>
+      {children}
     </div>
   )
 })
@@ -385,7 +365,7 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0",
+  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-2 group-data-[state=collapsed]/sidebar:py-2",
   {
     variants: {
       variant: {
@@ -395,6 +375,7 @@ const sidebarMenuButtonVariants = cva(
       },
       size: {
         default: "h-9 text-sm",
+        icon: "size-9",
       },
     },
     defaultVariants: {
@@ -427,14 +408,16 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
+    
+    const buttonSize = state === 'collapsed' ? 'icon' : size;
 
     const button = (
       <Comp
         ref={ref}
         data-sidebar="menu-button"
-        data-size={size}
+        data-size={buttonSize}
         data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+        className={cn(sidebarMenuButtonVariants({ variant, size: buttonSize }), className)}
         {...props}
       >
         {children}

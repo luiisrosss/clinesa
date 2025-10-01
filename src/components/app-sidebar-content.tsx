@@ -13,8 +13,10 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarSeparator,
+  SidebarFooter,
+  SidebarMenuLabel,
 } from "@/components/ui/sidebar";
-import { Home, Users, PlusCircle, ClipboardList, CalendarDays } from "lucide-react";
+import { Home, Users, PlusCircle, ClipboardList, CalendarDays, Settings, LifeBuoy } from "lucide-react";
 
 
 const navItems = [
@@ -22,6 +24,11 @@ const navItems = [
   { href: "/patients", icon: Users, label: "Clientes" },
   { href: "/sessions", icon: ClipboardList, label: "Sesiones" },
   { href: "/calendar", icon: CalendarDays, label: "Calendario" },
+];
+
+const secondaryNavItems = [
+    { href: "/settings", icon: Settings, label: "Ajustes" },
+    { href: "/support", icon: LifeBuoy, label: "Soporte" },
 ];
 
 export default function AppSidebarContent() {
@@ -36,19 +43,17 @@ export default function AppSidebarContent() {
 
       <SidebarContent>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => setIsNewEntryDialogOpen(true)} variant="outline" className="w-full justify-start text-sm bg-sidebar-accent hover:bg-sidebar-accent/80 text-sidebar-accent-foreground">
-              <PlusCircle />
-              <span>Nueva Nota</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarSearch />
-          </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarSearch />
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => setIsNewEntryDialogOpen(true)}>
+                    <PlusCircle />
+                    <SidebarMenuLabel>Nueva Nota</SidebarMenuLabel>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
         </SidebarMenu>
-
-        <SidebarSeparator />
-
+        
         <SidebarMenu>
           {navItems.map((item) => (
              <SidebarMenuItem key={item.href}>
@@ -58,13 +63,32 @@ export default function AppSidebarContent() {
                     tooltip={item.label}
                   >
                     <item.icon />
-                    <span>{item.label}</span>
+                    <SidebarMenuLabel>{item.label}</SidebarMenuLabel>
                   </SidebarMenuButton>
                 </Link>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
       </SidebarContent>
+
+        <SidebarFooter>
+            <SidebarSeparator />
+            <SidebarMenu>
+                 {secondaryNavItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <Link href={item.href} passHref>
+                        <SidebarMenuButton
+                            isActive={pathname.startsWith(item.href)}
+                            tooltip={item.label}
+                        >
+                            <item.icon />
+                            <SidebarMenuLabel>{item.label}</SidebarMenuLabel>
+                        </SidebarMenuButton>
+                        </Link>
+                    </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+        </SidebarFooter>
 
       <NewEntryDialog open={isNewEntryDialogOpen} onOpenChange={setIsNewEntryDialogOpen} />
     </>

@@ -5,16 +5,15 @@ import { useRouter } from "next/navigation";
 import { getPatients } from "@/data/patients";
 import type { Patient } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, PlusCircle, ChevronRight, User } from "lucide-react";
+import { Search, PlusCircle, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { SidebarInput } from "@/components/ui/sidebar";
+import { SidebarInput, useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarSearch() {
   const router = useRouter();
+  const { state: sidebarState } = useSidebar();
   const [allPatients, setAllPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,12 +22,18 @@ export function SidebarSearch() {
   useEffect(() => {
     const patients = getPatients();
     setAllPatients(patients);
-    setFilteredPatients(patients); // Initially show all
+    setFilteredPatients(patients);
   }, []);
 
   useEffect(() => {
+    if (sidebarState === 'collapsed') {
+      setIsPopoverOpen(false);
+      setSearchTerm('');
+      return;
+    }
     if (searchTerm === "") {
       setFilteredPatients(allPatients);
+      setIsPopoverOpen(false);
     } else {
       setFilteredPatients(
         allPatients.filter((patient) =>
@@ -37,14 +42,10 @@ export function SidebarSearch() {
             .includes(searchTerm.toLowerCase())
         )
       );
+      setIsPopoverOpen(true);
     }
-  }, [searchTerm, allPatients]);
+  }, [searchTerm, allPatients, sidebarState]);
   
-  useEffect(() => {
-    // Open popover if there is a search term
-    setIsPopoverOpen(searchTerm.length > 0);
-  }, [searchTerm]);
-
   const getInitials = (name: string, lastName: string) => {
     const firstInitial = name.charAt(0).toUpperCase();
     const lastInitial = lastName.charAt(0).toUpperCase();
@@ -62,19 +63,17 @@ export function SidebarSearch() {
 
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-        <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <PopoverTrigger asChild>
-                <SidebarInput
-                  placeholder="Buscar cliente..."
-                  className="pl-9"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onFocus={() => { if(searchTerm) setIsPopoverOpen(true)}}
-                />
-            </PopoverTrigger>
-        </div>
-      <PopoverContent className="w-[238px] p-0" align="start" side="right">
+        <PopoverTrigger asChild>
+             <SidebarInput
+                placeholder="Buscar cliente..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => { if(searchTerm) setIsPopoverOpen(true)}}
+            >
+                <Search className="h-4 w-4 text-muted-foreground" />
+             </SidebarInput>
+        </PopoverTrigger>
+      <PopoverContent className="w-[240px] p-0" align="start" side="right">
         <div className="divide-y divide-border rounded-lg bg-card">
             {displayedPatients.length > 0 ? (
             displayedPatients.map((patient) => (

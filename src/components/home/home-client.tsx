@@ -1,118 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getPatients } from "@/data/patients";
-import type { Patient } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search, PlusCircle, ChevronRight } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { Users, ClipboardList } from "lucide-react";
 
 export function HomeClient() {
-  const router = useRouter();
-  const [allPatients, setAllPatients] = useState<Patient[]>([]);
-  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
-
-  useEffect(() => {
-    const patients = getPatients();
-    setAllPatients(patients);
-  }, []);
-
-  useEffect(() => {
-    if (searchTerm === "") {
-      // Show all patients when search is empty but focused
-      setFilteredPatients(allPatients);
-    } else {
-      setFilteredPatients(
-        allPatients.filter((patient) =>
-          `${patient.name} ${patient.lastName}`
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
-        )
-      );
-    }
-  }, [searchTerm, allPatients]);
-
-  const getInitials = (name: string, lastName: string) => {
-    const firstInitial = name.charAt(0).toUpperCase();
-    const lastInitial = lastName.charAt(0).toUpperCase();
-    return `${firstInitial}${lastInitial}`;
-  };
-
-  // Show results if the input is focused.
-  const showResults = isFocused;
-  const displayedPatients = filteredPatients.slice(0, 3);
-  const hasMorePatients = filteredPatients.length > 3;
-
   return (
-    <div className="p-6 flex justify-center">
-      <div className="w-full max-w-md">
-        <div className="relative">
-          <Card className={`transition-all duration-300 ${showResults ? 'shadow-lg' : ''}`}>
-            <CardContent className="p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar clientes..."
-                  className="pl-10 text-base"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setTimeout(() => setIsFocused(false), 150)} // Delay to allow click on results
-                />
-              </div>
-
-              {showResults && (
-                <div className="mt-2 divide-y divide-border rounded-lg border">
-                  {displayedPatients.length > 0 ? (
-                    displayedPatients.map((patient) => (
-                      <Link href={`/patients/${patient.id}`} key={patient.id} passHref>
-                        <div
-                          className="flex items-center justify-between p-3 hover:bg-secondary cursor-pointer"
-                        >
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8 text-sm">
-                              <AvatarFallback>
-                                {getInitials(patient.name, patient.lastName)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="font-medium">{patient.name} {patient.lastName}</span>
-                          </div>
-                          <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                      </Link>
-                    ))
-                  ) : (
-                    <p className="p-4 text-sm text-center text-muted-foreground">
-                      No se encontraron clientes.
-                    </p>
-                  )}
-                   {hasMorePatients && (
-                     <Link href="/patients">
-                        <div className="p-3 text-sm text-center text-primary hover:bg-secondary cursor-pointer font-medium">
-                            Ver más resultados
-                        </div>
-                     </Link>
-                   )}
-                   <div className="p-2">
-                        <Button variant="ghost" className="w-full" asChild>
-                           <Link href="/patients/new">
-                               <PlusCircle className="mr-2 h-4 w-4" />
-                               Crear nuevo cliente
-                           </Link>
-                        </Button>
-                      </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+    <div className="p-6">
+        <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Gestionar Clientes</CardTitle>
+                    <CardDescription>Ver, editar o añadir nuevos clientes a tus registros.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button asChild>
+                        <Link href="/patients">
+                            <Users className="mr-2" /> Ir a Clientes
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader>
+                    <CardTitle>Gestionar Sesiones</CardTitle>
+                    <CardDescription>Revisar, editar o crear nuevas sesiones para tus clientes.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button asChild>
+                        <Link href="/sessions">
+                            <ClipboardList className="mr-2" /> Ir a Sesiones
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
         </div>
-      </div>
     </div>
   );
 }

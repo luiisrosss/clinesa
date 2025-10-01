@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Home, Users, PlusCircle, ClipboardList } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { NewEntryDialog } from "./new-entry-dialog";
+import { SidebarSearch } from "./sidebar-search";
 
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Home" },
@@ -31,7 +32,11 @@ export default function AppSidebar() {
             <PlusCircle className="mr-2 h-4 w-4" />
             Nueva Nota
           </Button>
-          <Separator className="my-4" />
+          
+          <SidebarSearch />
+
+          <Separator className="my-2" />
+
           {navItems.map((item) => (
             <Button
               key={item.href}

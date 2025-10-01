@@ -6,7 +6,7 @@ export default function HomePage() {
     <>
       <PageHeader
         title="Home"
-        description="Busca un cliente o crea una nueva sesión."
+        description="Bienvenido a Clinesa. Gestiona tus clientes y sesiones desde aquí."
       />
       <HomeClient />
     </>

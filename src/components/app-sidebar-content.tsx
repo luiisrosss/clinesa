@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { AppLogo } from "@/components/app-logo";
 import { NewEntryDialog } from "./new-entry-dialog";
 import { SidebarSearch } from "./sidebar-search";
 import { 

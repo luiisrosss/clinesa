@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AppLogo } from "@/components/app-logo";
 import { Button } from "@/components/ui/button";
-import { Home, Users, PlusCircle, ClipboardList } from "lucide-react";
+import { Home, Users, PlusCircle, ClipboardList, CalendarDays } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { NewEntryDialog } from "./new-entry-dialog";
 import { SidebarSearch } from "./sidebar-search";
@@ -14,6 +14,7 @@ const navItems = [
   { href: "/dashboard", icon: Home, label: "Home" },
   { href: "/patients", icon: Users, label: "Clientes" },
   { href: "/sessions", icon: ClipboardList, label: "Sesiones" },
+  { href: "/calendar", icon: CalendarDays, label: "Calendario" },
 ];
 
 export default function AppSidebar() {

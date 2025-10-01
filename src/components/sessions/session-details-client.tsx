@@ -188,7 +188,7 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><BarChart /> Métricas de Conversación</CardTitle>
-          </Header>
+          </CardHeader>
           <CardContent>
              <Button onClick={() => handleProcess('metrics')} disabled={isPending || !session.transcription}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

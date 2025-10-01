@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Session } from "@/lib/types";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -9,11 +9,15 @@ import { es } from "date-fns/locale";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { getSessions } from "@/data/sessions";
 
-export function CalendarClient({ sessions }: { sessions: Session[] }) {
+export function CalendarClient() {
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const sessionDates = sessions.map(s => new Date(s.sessionDate).toDateString());
+  useEffect(() => {
+    setSessions(getSessions());
+  }, []);
 
   const sessionsForSelectedDay = date
     ? sessions.filter(

@@ -4,12 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AppLogo } from "@/components/app-logo";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, PlusCircle } from "lucide-react";
+import { LayoutDashboard, Users, PlusCircle, ClipboardList } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/sessions", icon: Users, label: "Sessions" },
+  { href: "/patients", icon: Users, label: "Pacientes" },
+  { href: "/sessions", icon: ClipboardList, label: "Sesiones" },
 ];
 
 export default function AppSidebar() {
@@ -25,7 +26,7 @@ export default function AppSidebar() {
         <Button asChild variant="default" className="w-full justify-start">
           <Link href="/sessions/new">
             <PlusCircle className="mr-2 h-4 w-4" />
-            New Session
+            Nueva Sesión
           </Link>
         </Button>
         <Separator className="my-4" />

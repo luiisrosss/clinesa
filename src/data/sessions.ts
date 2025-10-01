@@ -2,34 +2,47 @@
 
 import type { Session } from "@/lib/types";
 
-const SESSIONS_KEY = "mindscribe-sessions";
+const SESSIONS_KEY = "clinesa-sessions";
 
 const initialSessions: Session[] = [
     {
       id: "1",
-      patientName: "Alex Doe",
+      patientId: "p2",
+      patientName: "Jane Smith",
+      professionalId: "prof1",
       sessionDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      sessionNumber: 5,
-      notes: "Patient shows significant progress in cognitive reframing techniques. Discussed childhood memories and their impact on current relationships. Mood appears elevated compared to previous sessions.",
+      duration: 50,
+      notes: {
+        subjective: "Patient reports feeling less anxious this week.",
+        objective: "Appeared calm and engaged during the session.",
+        analysis: "Progressing well with anxiety management techniques.",
+        plan: "Continue with mindfulness exercises and introduce thought records.",
+      }
     },
     {
       id: "2",
-      patientName: "Jane Smith",
+      patientId: "p1",
+      patientName: "Alex Doe",
+      professionalId: "prof1",
       sessionDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      sessionNumber: 12,
-      notes: "Focus on anxiety management strategies. Patient reports experiencing fewer panic attacks. We practiced mindfulness and breathing exercises. Next session will explore exposure therapy.",
-      transcription: "Hello Jane, how have you been since our last session? ... I've been better, doctor. The breathing exercises have helped a lot. I only had one panic attack this week. ... That's wonderful to hear. Let's talk more about that.",
+      duration: 50,
+      transcription: "Hello Alex, how have you been since our last session? ... I've been better, doctor. The breathing exercises have helped a lot. I only had one panic attack this week. ... That's wonderful to hear. Let's talk more about that.",
     }
 ];
 
 
 export const getSessions = (): Session[] => {
   if (typeof window === "undefined") return [];
-  const sessions = localStorage.getItem(SESSIONS_KEY);
-  if (sessions) {
-    return JSON.parse(sessions);
-  } else {
-    localStorage.setItem(SESSIONS_KEY, JSON.stringify(initialSessions));
+  try {
+    const sessions = localStorage.getItem(SESSIONS_KEY);
+    if (sessions) {
+      return JSON.parse(sessions);
+    } else {
+      localStorage.setItem(SESSIONS_KEY, JSON.stringify(initialSessions));
+      return initialSessions;
+    }
+  } catch (error) {
+    console.error("Failed to access localStorage:", error);
     return initialSessions;
   }
 };

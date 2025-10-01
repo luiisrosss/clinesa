@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Mic, FileAudio, BrainCircuit, BarChart, FileText, Upload } from "lucide-react";
+import { Loader2, Mic, FileAudio, BrainCircuit, BarChart, FileText, Upload, StickyNote } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -20,6 +20,8 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart as RechartsBarChart, XAxis, YAxis } from "recharts";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
 
 export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -43,6 +45,15 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
       return newSession;
     });
   };
+  
+  const updateNotes = (noteType: 'subjective' | 'objective' | 'analysis' | 'plan', value: string) => {
+    updateSession({
+        notes: {
+            ...session?.notes,
+            [noteType]: value,
+        }
+    })
+  }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -50,12 +61,12 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
       try {
         const audioDataUri = await fileToBase64(file);
         updateSession({ audioUrl: audioDataUri });
-        toast({ title: "Audio uploaded successfully." });
+        toast({ title: "Audio subido con éxito." });
       } catch (error) {
-        toast({ title: "Failed to read audio file.", variant: "destructive" });
+        toast({ title: "Error al leer el archivo de audio.", variant: "destructive" });
       }
     } else {
-      toast({ title: "Please upload an MP3 file.", variant: "destructive" });
+      toast({ title: "Por favor, sube un archivo MP3.", variant: "destructive" });
     }
   };
 
@@ -66,32 +77,32 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
       try {
         if (action === 'transcribe') {
           if (!session.audioUrl) {
-            toast({ title: "No audio file to transcribe.", variant: "destructive" });
+            toast({ title: "No hay archivo de audio para transcribir.", variant: "destructive" });
             return;
           }
           const result = await runTranscription({ audioDataUri: session.audioUrl });
           updateSession({ transcription: result.transcription });
-          toast({ title: "Transcription complete." });
+          toast({ title: "Transcripción completa." });
         } else if (action === 'analyze') {
           if (!session.transcription) {
-            toast({ title: "No transcription to analyze.", variant: "destructive" });
+            toast({ title: "No hay transcripción para analizar.", variant: "destructive" });
             return;
           }
           const result = await runAnalysis({ transcript: session.transcription });
           updateSession({ analysis: result });
-          toast({ title: "Analysis complete." });
+          toast({ title: "Análisis completo." });
         } else if (action === 'metrics') {
           if (!session.transcription) {
-            toast({ title: "No transcription to analyze for metrics.", variant: "destructive" });
+            toast({ title: "No hay transcripción para analizar métricas.", variant: "destructive" });
             return;
           }
           const result = await runMetrics({ transcript: session.transcription });
           updateSession({ metrics: result });
-          toast({ title: "Metrics captured." });
+          toast({ title: "Métricas capturadas." });
         }
       } catch (error) {
         console.error(`${action} failed:`, error);
-        toast({ title: `Failed to ${action}.`, description: "Please try again.", variant: "destructive" });
+        toast({ title: `Error al ${action}.`, description: "Por favor, inténtalo de nuevo.", variant: "destructive" });
       }
     });
   };
@@ -101,7 +112,7 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
   }
 
   if (!session) {
-    return <div className="text-center p-6">Session not found.</div>;
+    return <div className="text-center p-6">Sesión no encontrada.</div>;
   }
 
   const chartData = session.metrics?.speakerTime ?? [];
@@ -112,14 +123,50 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
   return (
     <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><StickyNote /> Notas SOAP</CardTitle>
+            <CardDescription>Documenta la sesión siguiendo el método SOAP.</CardDescription>
+          </CardHeader>
+          <CardContent>
+             <Accordion type="single" collapsible className="w-full" defaultValue="subjective">
+                <AccordionItem value="subjective">
+                  <AccordionTrigger>S (Subjetivo)</AccordionTrigger>
+                  <AccordionContent>
+                    <Textarea value={session.notes?.subjective} onChange={e => updateNotes('subjective', e.target.value)} placeholder="Lo que el paciente expresa..." rows={5}/>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="objective">
+                  <AccordionTrigger>O (Objetivo)</AccordionTrigger>
+                  <AccordionContent>
+                    <Textarea value={session.notes?.objective} onChange={e => updateNotes('objective', e.target.value)} placeholder="Observaciones objetivas y medibles..." rows={5}/>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="analysis">
+                  <AccordionTrigger>A (Análisis)</AccordionTrigger>
+                  <AccordionContent>
+                    <Textarea value={session.notes?.analysis} onChange={e => updateNotes('analysis', e.target.value)} placeholder="Tu interpretación clínica..." rows={5}/>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="plan">
+                  <AccordionTrigger>P (Plan)</AccordionTrigger>
+                  <AccordionContent>
+                    <Textarea value={session.notes?.plan} onChange={e => updateNotes('plan', e.target.value)} placeholder="Próximos pasos, tareas, etc." rows={5}/>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+          </CardContent>
+        </Card>
+
         {/* Audio & Transcription Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Mic /> Audio & Transcription</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Mic /> Audio y Transcripción</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="audio-upload">Upload Session Audio (.mp3)</Label>
+              <Label htmlFor="audio-upload">Subir Audio de la Sesión (.mp3)</Label>
               <div className="flex gap-2">
                 <Input id="audio-upload" type="file" accept=".mp3" onChange={handleFileUpload} className="flex-1" />
                 <Button variant="outline" size="icon" className="h-10 w-10" asChild>
@@ -134,11 +181,11 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
             )}
             <Button onClick={() => handleProcess('transcribe')} disabled={isPending || !session.audioUrl}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Transcribe Audio
+              Transcribir Audio
             </Button>
             {session.transcription && (
-              <Card className="bg-muted/50">
-                <CardHeader><CardTitle className="text-lg flex items-center gap-2"><FileAudio/> Transcription</CardTitle></CardHeader>
+              <Card className="bg-muted/50 max-h-60 overflow-y-auto">
+                <CardHeader><CardTitle className="text-lg flex items-center gap-2"><FileAudio/> Transcripción</CardTitle></CardHeader>
                 <CardContent>
                   <p className="text-sm whitespace-pre-wrap font-mono">{session.transcription}</p>
                 </CardContent>
@@ -146,27 +193,29 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
             )}
           </CardContent>
         </Card>
+      </div>
 
+      <div className="lg:col-span-1 space-y-6">
         {/* AI Analysis Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><BrainCircuit /> AI-Powered Analysis</CardTitle>
+            <CardTitle className="flex items-center gap-2"><BrainCircuit /> Análisis con IA</CardTitle>
           </CardHeader>
           <CardContent>
             <Button onClick={() => handleProcess('analyze')} disabled={isPending || !session.transcription}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Analyze Session
+              Analizar Sesión
             </Button>
             {session.analysis && (
-              <div className="mt-4 space-y-4">
-                <h3 className="font-semibold">Summary</h3>
-                <p className="text-sm">{session.analysis.summary}</p>
-                <h3 className="font-semibold">Key Discussion Points</h3>
-                <p className="text-sm">{session.analysis.keyDiscussionPoints}</p>
-                 <h3 className="font-semibold">Emotional Cues</h3>
-                <p className="text-sm">{session.analysis.emotionalCues}</p>
-                 <h3 className="font-semibold">Potential Key Metrics</h3>
-                <p className="text-sm">{session.analysis.potentialKeyMetrics}</p>
+              <div className="mt-4 space-y-4 text-sm">
+                <h3 className="font-semibold">Resumen</h3>
+                <p>{session.analysis.summary}</p>
+                <h3 className="font-semibold">Puntos Clave de Discusión</h3>
+                <p>{session.analysis.keyDiscussionPoints}</p>
+                 <h3 className="font-semibold">Señales Emocionales</h3>
+                <p>{session.analysis.emotionalCues}</p>
+                 <h3 className="font-semibold">Métricas Clave Potenciales</h3>
+                <p>{session.analysis.potentialKeyMetrics}</p>
               </div>
             )}
           </CardContent>
@@ -175,26 +224,25 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
         {/* Metrics Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><BarChart /> Conversation Metrics</CardTitle>
+            <CardTitle className="flex items-center gap-2"><BarChart /> Métricas de Conversación</CardTitle>
           </CardHeader>
           <CardContent>
              <Button onClick={() => handleProcess('metrics')} disabled={isPending || !session.transcription}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Capture Metrics
+              Capturar Métricas
             </Button>
             {session.metrics && (
               <div className="mt-4 space-y-4">
-                 <h3 className="font-semibold">Speaker Time</h3>
-                  <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                    <RechartsBarChart accessibilityLayer data={chartData}>
-                      <XAxis dataKey="speaker" tickLine={false} axisLine={false} tickMargin={8} />
-                      <YAxis />
+                 <h3 className="font-semibold">Tiempo por Interlocutor</h3>
+                  <ChartContainer config={chartConfig} className="h-[150px] w-full">
+                    <RechartsBarChart accessibilityLayer data={chartData} layout="vertical">
+                      <XAxis type="number" hide />
+                      <YAxis dataKey="speaker" type="category" tickLine={false} axisLine={false} tickMargin={8} width={80} />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <ChartLegend content={<ChartLegendContent />} />
                       <Bar dataKey="time" fill="var(--color-time)" radius={4} />
                     </RechartsBarChart>
                   </ChartContainer>
-                <h3 className="font-semibold">Response Intensity</h3>
+                <h3 className="font-semibold">Intensidad de Respuesta</h3>
                 <ul className="text-sm list-disc pl-5">
                 {session.metrics.responseIntensity.map(item => (
                   <li key={item.speaker}>{item.speaker}: {item.intensity}/10</li>
@@ -202,24 +250,6 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
                 </ul>
               </div>
             )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Notes Card */}
-      <div className="lg:col-span-1 space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><FileText /> Session Notes</CardTitle>
-            <CardDescription>Add your personal notes for this session.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              value={session.notes}
-              onChange={(e) => updateSession({ notes: e.target.value })}
-              rows={15}
-              placeholder="Type your notes here..."
-            />
           </CardContent>
         </Card>
       </div>

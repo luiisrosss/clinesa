@@ -14,15 +14,15 @@ export function SessionCard({ session }: SessionCardProps) {
     <Card>
       <CardHeader>
         <CardTitle className="font-headline">
-          {session.patientName} - Session #{session.sessionNumber}
+          {session.patientName} - {format(new Date(session.sessionDate), "PPP")}
         </CardTitle>
         <CardDescription>
-          {format(new Date(session.sessionDate), "MMMM d, yyyy")}
+          Duración: {session.duration} minutos
         </CardDescription>
       </CardHeader>
       <CardContent className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground line-clamp-2 max-w-md">
-          {session.notes || "No notes for this session yet."}
+          {session.notes?.subjective || session.notes?.plan || "No hay notas para esta sesión todavía."}
         </p>
         <Button asChild variant="ghost" size="icon">
           <Link href={`/sessions/${session.id}`} aria-label={`View session with ${session.patientName}`}>

@@ -10,6 +10,14 @@ type SessionCardProps = {
 };
 
 export function SessionCard({ session }: SessionCardProps) {
+
+  const getNotesPreview = (notes: string | object | undefined): string => {
+    if (typeof notes === 'string') {
+      return notes;
+    }
+    return "No hay notas para esta sesión todavía.";
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -22,7 +30,7 @@ export function SessionCard({ session }: SessionCardProps) {
       </CardHeader>
       <CardContent className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground line-clamp-2 max-w-md">
-          {session.notes || "No hay notas para esta sesión todavía."}
+          {getNotesPreview(session.notes)}
         </p>
         <Button asChild variant="ghost" size="icon">
           <Link href={`/sessions/${session.id}`} aria-label={`View session with ${session.patientName}`}>

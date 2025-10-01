@@ -11,16 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Mic, FileAudio, BrainCircuit, BarChart, FileText, Upload, StickyNote } from "lucide-react";
+import { Loader2, Mic, FileAudio, BrainCircuit, BarChart, Upload, StickyNote } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart as RechartsBarChart, XAxis, YAxis } from "recharts";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 
 export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
@@ -52,7 +49,7 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type === "audio/mpeg") {
+    if (file && (file.type === "audio/mpeg" || file.type === "audio/mp4" || file.type === "video/mp4")) {
       try {
         const audioDataUri = await fileToBase64(file);
         updateSession({ audioUrl: audioDataUri });
@@ -61,7 +58,7 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
         toast({ title: "Error al leer el archivo de audio.", variant: "destructive" });
       }
     } else {
-      toast({ title: "Por favor, sube un archivo MP3.", variant: "destructive" });
+      toast({ title: "Por favor, sube un archivo MP3 o MP4.", variant: "destructive" });
     }
   };
 
@@ -119,26 +116,22 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
     <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
         
+        {/* Audio, Transcription & Notes Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><StickyNote /> Notas de la Sesión</CardTitle>
-            <CardDescription>Añade tus notas y observaciones de la sesión.</CardDescription>
+            <CardTitle className="flex items-center gap-2"><Mic /> Sesión</CardTitle>
+            <CardDescription>Sube el audio, toma notas y analiza la sesión.</CardDescription>
           </CardHeader>
-          <CardContent>
-             <Textarea value={session.notes} onChange={e => updateNotes(e.target.value)} placeholder="Escribe tus notas aquí..." rows={10}/>
-          </CardContent>
-        </Card>
-
-        {/* Audio & Transcription Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Mic /> Audio y Transcripción</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
+             <div>
+              <Label htmlFor="notes" className="flex items-center gap-2 mb-2"><StickyNote /> Notas de la Sesión</Label>
+              <Textarea id="notes" value={session.notes} onChange={e => updateNotes(e.target.value)} placeholder="Escribe tus notas aquí..." rows={8}/>
+            </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="audio-upload">Subir Audio de la Sesión (.mp3)</Label>
+              <Label htmlFor="audio-upload">Subir Audio (.mp3, .mp4)</Label>
               <div className="flex gap-2">
-                <Input id="audio-upload" type="file" accept=".mp3" onChange={handleFileUpload} className="flex-1" />
+                <Input id="audio-upload" type="file" accept=".mp3,.mp4" onChange={handleFileUpload} className="flex-1" />
                 <Button variant="outline" size="icon" className="h-10 w-10" asChild>
                   <Label htmlFor="audio-upload" className="cursor-pointer">
                     <Upload className="h-4 w-4" />
@@ -195,7 +188,7 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><BarChart /> Métricas de Conversación</CardTitle>
-          </CardHeader>
+          </Header>
           <CardContent>
              <Button onClick={() => handleProcess('metrics')} disabled={isPending || !session.transcription}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

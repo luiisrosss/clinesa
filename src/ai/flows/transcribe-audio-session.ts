@@ -16,7 +16,7 @@ const TranscribeAudioSessionInputSchema = z.object({
   audioDataUri: z
     .string()
     .describe(
-      'The audio data URI of the patient session recording. Must be an mp3 file format as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:audio/mp3;base64,<encoded_data>\'.' //Enforce mp3 file format
+      "The audio data URI of the patient session recording. Must be an mp3 or mp4 file format as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:audio/mpeg;base64,<encoded_data>' or 'data:audio/mp4;base64,<encoded_data>'."
     ),
 });
 export type TranscribeAudioSessionInput = z.infer<typeof TranscribeAudioSessionInputSchema>;

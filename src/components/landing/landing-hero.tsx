@@ -10,11 +10,11 @@ export function LandingHero() {
           Recupera tu Tiempo. Eleva tu Terapia.
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-          La plataforma con IA que automatiza tus notas de sesión y te ofrece análisis inteligentes para que puedas centrarte en tus pacientes.
+          La plataforma con IA que automatiza tus notas de sesión y te ofrece análisis inteligentes para que puedas centrarte en tus clientes.
         </p>
         <div className="flex justify-center gap-4">
           <Button size="lg" asChild>
-            <Link href="/dashboard">Empieza Gratis</Link>
+            <Link href="/home">Empieza Gratis</Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
             <Link href="#features">Descubre Más</Link>

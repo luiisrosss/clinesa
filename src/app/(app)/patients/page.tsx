@@ -39,13 +39,13 @@ export default function PatientsPage() {
   return (
     <>
       <PageHeader
-        title="Pacientes"
-        description="Gestiona los registros de tus pacientes."
+        title="Clientes"
+        description="Gestiona los registros de tus clientes."
       >
         <Button asChild>
           <Link href="/patients/new">
             <PlusCircle className="mr-2 h-4 w-4" />
-            Nuevo Paciente
+            Nuevo Cliente
           </Link>
         </Button>
       </PageHeader>
@@ -56,7 +56,7 @@ export default function PatientsPage() {
               <PatientCard key={patient.id} patient={patient} />
             ))
           ) : (
-            <p className="text-muted-foreground text-center col-span-full">No se encontraron pacientes.</p>
+            <p className="text-muted-foreground text-center col-span-full">No se encontraron clientes.</p>
           )}
         </div>
       </div>

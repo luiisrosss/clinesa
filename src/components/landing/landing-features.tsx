@@ -19,8 +19,8 @@ export function LandingFeatures() {
     },
     {
       icon: <Users className="h-10 w-10 text-primary" />,
-      title: "Gestión de Pacientes",
-      description: "Mantén un registro centralizado y seguro de todos tus pacientes y su historial de sesiones."
+      title: "Gestión de Clientes",
+      description: "Mantén un registro centralizado y seguro de todos tus clientes y su historial de sesiones."
     },
   ];
 
@@ -32,7 +32,7 @@ export function LandingFeatures() {
     },
     {
       icon: <Zap className="h-8 w-8 text-primary" />,
-      title: "Enfócate en tus Pacientes",
+      title: "Enfócate en tus Clientes",
       description: "Libera tu mente del papeleo y dedica tu energía a lo que mejor sabes hacer: la terapia."
     },
     {

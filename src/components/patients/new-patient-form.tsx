@@ -90,7 +90,7 @@ export function NewPatientForm() {
     savePatient(newPatient);
     toast({
       title: "Éxito",
-      description: "Nuevo paciente creado.",
+      description: "Nuevo cliente creado.",
     });
     router.push(`/patients`);
   };
@@ -99,9 +99,9 @@ export function NewPatientForm() {
     <div className="p-6">
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle>Detalles del Paciente</CardTitle>
+          <CardTitle>Detalles del Cliente</CardTitle>
           <CardDescription>
-            Completa la información para el nuevo paciente.
+            Completa la información para el nuevo cliente.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -207,7 +207,7 @@ export function NewPatientForm() {
                     <Input id="assignedProfessional" value={assignedProfessional} onChange={(e) => setAssignedProfessional(e.target.value)} required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="referralSource">Origen del Paciente</Label>
+                    <Label htmlFor="referralSource">Origen del Cliente</Label>
                     <Input id="referralSource" value={referralSource} onChange={(e) => setReferralSource(e.target.value)} placeholder="Web, recomendación..."/>
                   </div>
                 </div>
@@ -232,7 +232,7 @@ export function NewPatientForm() {
                 </div>
             </div>
 
-            <Button type="submit" className="w-full !mt-10">Guardar Paciente</Button>
+            <Button type="submit" className="w-full !mt-10">Guardar Cliente</Button>
           </form>
         </CardContent>
       </Card>

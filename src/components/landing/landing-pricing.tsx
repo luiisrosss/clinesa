@@ -12,11 +12,11 @@ export function LandingPricing() {
       features: [
         "10 transcripciones al mes",
         "Análisis de IA en 5 sesiones",
-        "Gestión de hasta 15 pacientes",
+        "Gestión de hasta 15 clientes",
         "Soporte por email"
       ],
       cta: "Empieza Gratis",
-      href: "/dashboard"
+      href: "/home"
     },
     {
       name: "Profesional",
@@ -26,11 +26,11 @@ export function LandingPricing() {
       features: [
         "Transcripciones ilimitadas",
         "Análisis de IA ilimitados",
-        "Pacientes ilimitados",
+        "Clientes ilimitados",
         "Soporte prioritario"
       ],
       cta: "Elige Profesional",
-      href: "/dashboard",
+      href: "/home",
       popular: true
     },
      {

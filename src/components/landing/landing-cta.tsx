@@ -7,10 +7,10 @@ export function LandingCta() {
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold font-headline mb-4">Transforma tu Práctica Hoy</h2>
         <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Deja que la inteligencia artificial se encargue del trabajo pesado y dedica más tiempo a lo que realmente importa: tus pacientes.
+          Deja que la inteligencia artificial se encargue del trabajo pesado y dedica más tiempo a lo que realmente importa: tus clientes.
         </p>
         <Button size="lg" asChild>
-          <Link href="/dashboard">Empieza Gratis</Link>
+          <Link href="/home">Empieza Gratis</Link>
         </Button>
       </div>
     </section>

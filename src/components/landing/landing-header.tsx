@@ -15,7 +15,7 @@ export function LandingHeader() {
           </nav>
         </div>
         <Button asChild>
-          <Link href="/dashboard">Iniciar Sesión</Link>
+          <Link href="/home">Iniciar Sesión</Link>
         </Button>
       </div>
     </header>

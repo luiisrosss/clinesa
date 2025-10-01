@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AppLogo } from "@/components/app-logo";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, PlusCircle, ClipboardList } from "lucide-react";
+import { Home, Users, PlusCircle, ClipboardList } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const navItems = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/patients", icon: Users, label: "Pacientes" },
+  { href: "/home", icon: Home, label: "Home" },
+  { href: "/patients", icon: Users, label: "Clientes" },
   { href: "/sessions", icon: ClipboardList, label: "Sesiones" },
 ];
 

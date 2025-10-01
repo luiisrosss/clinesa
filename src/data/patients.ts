@@ -7,8 +7,8 @@ const PATIENTS_KEY = "clinesa-patients";
 const initialPatients: Patient[] = [
     {
       id: "p1",
-      name: "Alex",
-      lastName: "Doe",
+      name: "Alex Doe",
+      lastName: "(demo)",
       phone: "555-0101",
       email: "alex.doe@example.com",
       registrationDate: new Date().toISOString(),
@@ -17,8 +17,8 @@ const initialPatients: Patient[] = [
     },
     {
       id: "p2",
-      name: "Jane",
-      lastName: "Smith",
+      name: "Jane Smith",
+      lastName: "(demo)",
       phone: "555-0102",
       email: "jane.smith@example.com",
       registrationDate: new Date().toISOString(),

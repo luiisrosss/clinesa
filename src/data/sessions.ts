@@ -8,7 +8,7 @@ const initialSessions: Session[] = [
     {
       id: "1",
       patientId: "p2",
-      patientName: "Jane Smith",
+      patientName: "Jane Smith (demo)",
       professionalId: "prof1",
       sessionDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
       duration: 50,
@@ -17,7 +17,7 @@ const initialSessions: Session[] = [
     {
       id: "2",
       patientId: "p1",
-      patientName: "Alex Doe",
+      patientName: "Alex Doe (demo)",
       professionalId: "prof1",
       sessionDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
       duration: 50,

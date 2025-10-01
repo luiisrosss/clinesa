@@ -58,7 +58,7 @@ export function NewSessionForm() {
     setPatients(allPatients);
     setSelectedPatientId(newPatientId);
     setIsPatientModalOpen(false);
-    toast({ title: "Éxito", description: "Nuevo paciente creado y seleccionado."});
+    toast({ title: "Éxito", description: "Nuevo cliente creado y seleccionado."});
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -104,11 +104,11 @@ export function NewSessionForm() {
               <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                      <Label htmlFor="patient">Paciente *</Label>
+                      <Label htmlFor="patient">Cliente *</Label>
                       <div className="flex gap-2">
                         <Select value={selectedPatientId} onValueChange={setSelectedPatientId} required>
                           <SelectTrigger id="patient">
-                              <SelectValue placeholder="Selecciona un paciente" />
+                              <SelectValue placeholder="Selecciona un cliente" />
                           </SelectTrigger>
                           <SelectContent>
                               {patients.map(p => (

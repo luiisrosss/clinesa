@@ -42,9 +42,11 @@ export default function AppSidebarContent() {
       <SidebarHeader>
         <div className="flex items-center gap-2">
             <BrainCircuit className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold font-headline text-foreground transition-opacity duration-100 group-data-[state=collapsed]/sidebar-wrapper:opacity-0">
-                Clinesa
-            </h1>
+            <SidebarMenuLabel>
+              <h1 className="text-xl font-bold font-headline text-foreground">
+                  Clinesa
+              </h1>
+            </SidebarMenuLabel>
         </div>
       </SidebarHeader>
 

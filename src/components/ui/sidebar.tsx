@@ -269,7 +269,7 @@ const SidebarInput = React.forwardRef<
   const { state } = useSidebar();
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-opacity group-data-[state=collapsed]/sidebar-wrapper:opacity-100" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       <Input
         ref={ref}
         className={cn(
@@ -464,7 +464,7 @@ const SidebarMenuLabel = React.forwardRef<
         <span
             ref={ref}
             className={cn(
-                "truncate transition-opacity duration-100 group-data-[state=collapsed]/sidebar-wrapper:opacity-0",
+                "truncate transition-opacity duration-100 group-data-[state=collapsed]/sidebar-wrapper:opacity-0 group-data-[state=collapsed]/sidebar-wrapper:hidden",
                 className
             )}
             {...props}

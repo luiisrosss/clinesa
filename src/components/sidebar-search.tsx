@@ -9,7 +9,7 @@ import { Search, PlusCircle, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { SidebarInput, useSidebar } from "@/components/ui/sidebar";
+import { SidebarInput, useSidebar, SidebarMenuButton, SidebarMenuLabel } from "@/components/ui/sidebar";
 
 export function SidebarSearch() {
   const router = useRouter();
@@ -61,15 +61,30 @@ export function SidebarSearch() {
   const displayedPatients = filteredPatients.slice(0, 3);
   const hasMorePatients = filteredPatients.length > 3;
 
+  if (sidebarState === "collapsed") {
+    return (
+      <SidebarMenuButton tooltip="Buscar cliente..." asChild>
+        <button onClick={() => router.push('/patients')}>
+            <Search />
+            <SidebarMenuLabel>Buscar cliente</SidebarMenuLabel>
+        </button>
+      </SidebarMenuButton>
+    )
+  }
+
   return (
     <Popover open={isPopoverOpen && sidebarState === 'expanded'} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
-        <SidebarInput
-          placeholder="Buscar cliente..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onFocus={() => { if(searchTerm && sidebarState === 'expanded') setIsPopoverOpen(true)}}
-        />
+        <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <SidebarInput
+              placeholder="Buscar cliente..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onFocus={() => { if(searchTerm && sidebarState === 'expanded') setIsPopoverOpen(true)}}
+              className="pl-9"
+            />
+        </div>
       </PopoverTrigger>
       <PopoverContent className="w-[240px] p-0" align="start" side="right">
         <div className="divide-y divide-border rounded-lg bg-card">
@@ -77,7 +92,7 @@ export function SidebarSearch() {
             displayedPatients.map((patient) => (
                 <div
                     key={patient.id}
-                    onClick={() => handleLinkClick(`/patients/${patient.id}`)}
+                    onClick={() => handleLinkClick(`/patients`)}
                     className="flex items-center justify-between p-3 hover:bg-secondary cursor-pointer"
                 >
                     <div className="flex items-center gap-3">

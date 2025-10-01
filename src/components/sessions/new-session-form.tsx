@@ -18,9 +18,10 @@ import { format } from "date-fns";
 type NewSessionFormProps = {
   initialDate?: Date;
   onSessionCreated?: () => void;
+  onPatientCreated?: () => void;
 }
 
-export function NewSessionForm({ initialDate, onSessionCreated }: NewSessionFormProps) {
+export function NewSessionForm({ initialDate, onSessionCreated, onPatientCreated }: NewSessionFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -29,16 +30,31 @@ export function NewSessionForm({ initialDate, onSessionCreated }: NewSessionForm
   const [duration, setDuration] = useState(50);
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
 
-  useEffect(() => {
+  const fetchPatients = () => {
     const allPatients = getPatients();
     setPatients(allPatients);
-  }, [isPatientModalOpen]);
+  }
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
 
   useEffect(() => {
     if (initialDate) {
       setSessionDate(format(initialDate, "yyyy-MM-dd'T'HH:mm"));
     }
   }, [initialDate]);
+
+  const handlePatientModalClose = (open: boolean) => {
+    if (!open) {
+      // Refetch patients when dialog closes, in case a new one was created
+      fetchPatients();
+      if (onPatientCreated) {
+        onPatientCreated();
+      }
+    }
+    setIsPatientModalOpen(open);
+  }
 
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -145,12 +161,12 @@ export function NewSessionForm({ initialDate, onSessionCreated }: NewSessionForm
           </Card>
       </div>
       
-      <Dialog open={isPatientModalOpen} onOpenChange={setIsPatientModalOpen}>
+      <Dialog open={isPatientModalOpen} onOpenChange={handlePatientModalClose}>
         <DialogContent className="max-w-3xl">
-          <DialogHeader>
+           <DialogHeader>
             <DialogTitle>Crear Nuevo Cliente</DialogTitle>
             <DialogDescription>
-              Añade un nuevo cliente a tus registros.
+              Añade un nuevo cliente a tus registros. Al guardar, este formulario se cerrará.
             </DialogDescription>
           </DialogHeader>
            <NewPatientForm />

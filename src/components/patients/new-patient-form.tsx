@@ -14,7 +14,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 
-export function NewPatientForm() {
+type NewPatientFormProps = {
+  onPatientSaved?: () => void;
+}
+
+export function NewPatientForm({ onPatientSaved }: NewPatientFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   
@@ -92,19 +96,24 @@ export function NewPatientForm() {
       title: "Éxito",
       description: "Nuevo cliente creado.",
     });
-    router.push(`/patients`);
+
+    if (onPatientSaved) {
+      onPatientSaved();
+    } else {
+      router.push(`/patients`);
+    }
   };
 
   return (
     <div className="p-6">
-      <Card className="max-w-3xl mx-auto">
-        <CardHeader>
+      <Card className="max-w-3xl mx-auto border-0 shadow-none">
+        <CardHeader className="p-0">
           <CardTitle>Detalles del Cliente</CardTitle>
           <CardDescription>
             Completa la información para el nuevo cliente.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 pt-6">
           <form onSubmit={handleSubmit} className="space-y-8">
             
             {/* Basic Identification */}

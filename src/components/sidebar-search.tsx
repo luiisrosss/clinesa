@@ -86,7 +86,7 @@ export function SidebarSearch() {
             />
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-[240px] p-0" align="start" side="right">
+      <PopoverContent className="w-[224px] p-0" align="start" side="right">
         <div className="divide-y divide-border rounded-lg bg-card">
             {displayedPatients.length > 0 ? (
             displayedPatients.map((patient) => (

@@ -40,18 +40,14 @@ export default function AppSidebarContent() {
   return (
     <>
       <SidebarHeader>
-        <div className="flex items-center gap-2">
-          <SidebarMenuButton size="icon" className="h-10 w-10 flex-shrink-0" asChild>
-            <Link href="/dashboard" aria-label="Home">
-              <BrainCircuit className="h-5 w-5 text-primary" />
-            </Link>
-          </SidebarMenuButton>
-          <SidebarMenuLabel>
-            <h1 className="text-xl font-bold font-headline text-foreground">
-                Clinesa
-            </h1>
-          </SidebarMenuLabel>
-        </div>
+        <Link href="/dashboard" className="flex items-center gap-2" aria-label="Home">
+            <BrainCircuit className="h-6 w-6 text-primary flex-shrink-0" />
+            <SidebarMenuLabel>
+                <h1 className="text-xl font-bold font-headline text-foreground">
+                    Clinesa
+                </h1>
+            </SidebarMenuLabel>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>

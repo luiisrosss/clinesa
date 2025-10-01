@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSessions } from "@/data/sessions";
-import { getPatients } from "@/data/patients";
+import { getSessions } from "@/actions/sessions";
+import { getPatients } from "@/actions/patients";
 import type { Patient, Session } from "@/lib/types";
 import { add, sub, format, startOfWeek, endOfWeek } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { MonthView } from "@/components/calendar/month-view";
 import { WeekView } from "@/components/calendar/week-view";
 import { DayView } from "@/components/calendar/day-view";
@@ -19,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 type View = "month" | "week" | "day";
 
 export function CalendarClient() {
+  const { toast } = useToast();
   const [allSessions, setAllSessions] = useState<Session[]>([]);
   const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -27,13 +29,28 @@ export function CalendarClient() {
   const [view, setView] = useState<View>("month");
   const [isNewSessionModalOpen, setIsNewSessionModalOpen] = useState(false);
   const [newSessionDate, setNewSessionDate] = useState<Date | undefined>();
+  const [loading, setLoading] = useState(true);
 
-  const fetchAndSetData = () => {
-     const sessions = getSessions();
-     const patients = getPatients();
-     setAllSessions(sessions);
-     setFilteredSessions(sessions);
-     setPatients(patients);
+  const fetchAndSetData = async () => {
+    try {
+      setLoading(true);
+      const [sessions, patientsData] = await Promise.all([
+        getSessions(),
+        getPatients()
+      ]);
+      setAllSessions(sessions);
+      setFilteredSessions(sessions);
+      setPatients(patientsData);
+    } catch (error) {
+      console.error('Error fetching calendar data:', error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los datos del calendario.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -100,6 +117,14 @@ export function CalendarClient() {
   };
   
 
+  if (loading) {
+    return (
+      <div className="flex-1 flex justify-center items-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex-1 flex flex-col">
@@ -144,7 +169,7 @@ export function CalendarClient() {
             </div>
           </div>
         </header>
-        
+
         <main className="flex-1 overflow-auto">
           {view === 'month' && <MonthView date={currentDate} sessions={filteredSessions} onSlotClick={handleSlotClick} />}
           {view === 'week' && <WeekView date={currentDate} sessions={filteredSessions} onSlotClick={handleSlotClick} />}

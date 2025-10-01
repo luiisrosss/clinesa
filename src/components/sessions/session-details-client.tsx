@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { getSessionById, saveSession } from "@/data/sessions";
+import { getSessionById, saveSession } from "@/actions/sessions";
+import { uploadAudioFile, checkStorageAvailable } from "@/actions/audio";
 import { runTranscription, runAnalysis, runMetrics } from "@/lib/actions";
-import { fileToBase64 } from "@/lib/utils";
 import type { Session } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -27,20 +27,47 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    const data = getSessionById(sessionId);
-    if (data) {
-      setSession(data);
-    }
-    setIsLoading(false);
-  }, [sessionId]);
+    const fetchSession = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getSessionById(sessionId);
+        if (data) {
+          setSession(data);
+        }
+      } catch (error) {
+        console.error('Error fetching session:', error);
+        toast({
+          title: "Error",
+          description: "No se pudo cargar la sesión.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const updateSession = (updatedFields: Partial<Session>) => {
+    fetchSession();
+  }, [sessionId, toast]);
+
+  const updateSession = async (updatedFields: Partial<Session>) => {
     setSession(prev => {
       if (!prev) return null;
-      const newSession = { ...prev, ...updatedFields };
-      saveSession(newSession);
-      return newSession;
+      return { ...prev, ...updatedFields };
     });
+
+    if (session) {
+      try {
+        const newSession = { ...session, ...updatedFields };
+        await saveSession(newSession);
+      } catch (error) {
+        console.error('Error saving session:', error);
+        toast({
+          title: "Error",
+          description: "No se pudo guardar la sesión.",
+          variant: "destructive",
+        });
+      }
+    }
   };
   
   const updateNotes = (value: string) => {
@@ -49,16 +76,60 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && (file.type === "audio/mpeg" || file.type === "audio/mp4" || file.type === "video/mp4")) {
-      try {
-        const audioDataUri = await fileToBase64(file);
-        updateSession({ audioUrl: audioDataUri });
-        toast({ title: "Audio subido con éxito." });
-      } catch (error) {
-        toast({ title: "Error al leer el archivo de audio.", variant: "destructive" });
+    if (!file) return;
+
+    // Validar tipo de archivo
+    const validTypes = ["audio/mpeg", "audio/mp3", "audio/mp4", "audio/m4a", "video/mp4"];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Formato no válido",
+        description: "Por favor, sube un archivo MP3, M4A o MP4.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!session) return;
+
+    try {
+      setIsLoading(true);
+
+      // Verificar espacio disponible
+      const fileSizeMB = file.size / (1024 * 1024);
+      const storageCheck = await checkStorageAvailable(fileSizeMB);
+
+      if (!storageCheck.canUpload) {
+        toast({
+          title: "Espacio insuficiente",
+          description: `No tienes suficiente almacenamiento. Disponible: ${storageCheck.availableMB.toFixed(2)}MB / Requerido: ${fileSizeMB.toFixed(2)}MB`,
+          variant: "destructive",
+        });
+        return;
       }
-    } else {
-      toast({ title: "Por favor, sube un archivo MP3 o MP4.", variant: "destructive" });
+
+      // Subir archivo a Supabase Storage
+      const { url, storagePath, fileSizeMB: uploadedSize } = await uploadAudioFile(file, session.id);
+
+      // Actualizar sesión con la nueva URL y datos
+      await updateSession({
+        audioUrl: url,
+        audioStoragePath: storagePath,
+        audioSizeMB: uploadedSize,
+      });
+
+      toast({
+        title: "Audio subido con éxito",
+        description: `${uploadedSize.toFixed(2)}MB subidos correctamente.`
+      });
+    } catch (error: any) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Error al subir el archivo",
+        description: error.message || "Ocurrió un error inesperado.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,9 +143,29 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
             toast({ title: "No hay archivo de audio para transcribir.", variant: "destructive" });
             return;
           }
-          const result = await runTranscription({ audioDataUri: session.audioUrl });
-          updateSession({ transcription: result.transcription });
-          toast({ title: "Transcripción completa." });
+
+          // Validar duración de la sesión
+          if (!session.duration || session.duration <= 0) {
+            toast({
+              title: "Error",
+              description: "La sesión debe tener una duración válida.",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          const result = await runTranscription({
+            audioDataUri: session.audioUrl,
+            sessionId: session.id,
+            durationMinutes: session.duration
+          });
+
+          await updateSession({ transcription: result.transcription });
+
+          toast({
+            title: "Transcripción completa",
+            description: `Se consumieron créditos para ${session.duration} minutos de audio.`
+          });
         } else if (action === 'analyze') {
           if (!session.transcription) {
             toast({ title: "No hay transcripción para analizar.", variant: "destructive" });
@@ -92,9 +183,13 @@ export function SessionDetailsClient({ sessionId }: { sessionId: string }) {
           updateSession({ metrics: result });
           toast({ title: "Métricas capturadas." });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`${action} failed:`, error);
-        toast({ title: `Error al ${action}.`, description: "Por favor, inténtalo de nuevo.", variant: "destructive" });
+        toast({
+          title: `Error al ${action}`,
+          description: error.message || "Por favor, inténtalo de nuevo.",
+          variant: "destructive"
+        });
       }
     });
   };

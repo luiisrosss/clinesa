@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getPatients } from "@/data/patients";
+import { getPatients } from "@/actions/patients";
 import type { Patient } from "@/lib/types";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PlusCircle, User } from "lucide-react";
+import { PlusCircle, User, Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 function PatientCard({ patient }: { patient: Patient }) {
   return (
@@ -30,11 +31,30 @@ function PatientCard({ patient }: { patient: Patient }) {
 
 
 export default function PatientsPage() {
+  const { toast } = useToast();
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setPatients(getPatients());
-  }, []);
+    const fetchPatients = async () => {
+      try {
+        setLoading(true);
+        const allPatients = await getPatients();
+        setPatients(allPatients);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los clientes.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, [toast]);
 
   return (
     <>
@@ -51,7 +71,11 @@ export default function PatientsPage() {
       </PageHeader>
       <div className="p-6 flex-1 overflow-auto">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {patients.length > 0 ? (
+          {loading ? (
+            <div className="col-span-full flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : patients.length > 0 ? (
             patients.map((patient) => (
               <PatientCard key={patient.id} patient={patient} />
             ))

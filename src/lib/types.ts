@@ -63,7 +63,10 @@ export interface Session {
   };
   // Campos de AI que ya existían
   audioUrl?: string;
+  audioStoragePath?: string; // Path en Supabase Storage
+  audioSizeMB?: number; // Tamaño del archivo en MB
   transcription?: string;
   analysis?: AnalyzeSessionInsightsOutput;
   metrics?: CaptureConversationMetricsOutput;
+  creditsConsumed?: number; // Créditos consumidos en esta sesión
 }

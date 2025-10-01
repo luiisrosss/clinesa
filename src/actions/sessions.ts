@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import type { Session } from '@/lib/types';
+import { deleteAudioFile } from './audio';
 
 async function getProfessionalId() {
   const { userId } = await auth();
@@ -56,10 +57,13 @@ export async function getSessions(): Promise<Session[]> {
     consentRecording: session.consent_recording,
     attachments: session.attachments,
     audioUrl: session.audio_url,
+    audioStoragePath: session.audio_storage_path,
+    audioSizeMB: session.audio_size_mb,
     billing: session.billing,
     transcription: session.transcription,
     analysis: session.analysis,
     metrics: session.metrics,
+    creditsConsumed: session.credits_consumed,
   }));
 }
 
@@ -102,10 +106,13 @@ export async function getSessionById(id: string): Promise<Session | undefined> {
     consentRecording: data.consent_recording,
     attachments: data.attachments,
     audioUrl: data.audio_url,
+    audioStoragePath: data.audio_storage_path,
+    audioSizeMB: data.audio_size_mb,
     billing: data.billing,
     transcription: data.transcription,
     analysis: data.analysis,
     metrics: data.metrics,
+    creditsConsumed: data.credits_consumed,
   };
 }
 
@@ -144,10 +151,13 @@ export async function saveSession(sessionData: Session): Promise<Session> {
     consent_recording: sessionData.consentRecording,
     attachments: sessionData.attachments,
     audio_url: sessionData.audioUrl,
+    audio_storage_path: sessionData.audioStoragePath,
+    audio_size_mb: sessionData.audioSizeMB,
     billing: sessionData.billing,
     transcription: sessionData.transcription,
     analysis: sessionData.analysis,
     metrics: sessionData.metrics,
+    credits_consumed: sessionData.creditsConsumed,
   };
 
   const { data: existing } = await supabaseAdmin
@@ -207,9 +217,47 @@ export async function saveSession(sessionData: Session): Promise<Session> {
     consentRecording: data.consent_recording,
     attachments: data.attachments,
     audioUrl: data.audio_url,
+    audioStoragePath: data.audio_storage_path,
+    audioSizeMB: data.audio_size_mb,
     billing: data.billing,
     transcription: data.transcription,
     analysis: data.analysis,
     metrics: data.metrics,
+    creditsConsumed: data.credits_consumed,
   };
+}
+
+export async function deleteSession(sessionId: string): Promise<void> {
+  const professionalId = await getProfessionalId();
+
+  // Obtener la sesión para verificar si tiene audio
+  const { data: session } = await supabaseAdmin
+    .from('sessions')
+    .select('audio_url, audio_storage_path, audio_size_mb')
+    .eq('id', sessionId)
+    .eq('professional_id', professionalId)
+    .single();
+
+  // Si tiene audio en Storage, eliminarlo
+  if (session?.audio_storage_path && session?.audio_size_mb) {
+    try {
+      await deleteAudioFile(session.audio_storage_path, session.audio_size_mb);
+    } catch (error) {
+      console.error('Error deleting audio file:', error);
+      // Continuamos con la eliminación de la sesión aunque falle el audio
+    }
+  }
+
+  // Eliminar la sesión de la base de datos
+  const { error } = await supabaseAdmin
+    .from('sessions')
+    .delete()
+    .eq('id', sessionId)
+    .eq('professional_id', professionalId);
+
+  if (error) throw error;
+
+  revalidatePath('/sessions');
+  revalidatePath('/dashboard');
+  revalidatePath('/calendar');
 }

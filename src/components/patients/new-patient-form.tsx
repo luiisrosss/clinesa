@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { savePatient } from "@/data/patients";
+import { savePatient } from "@/actions/patients";
 import type { Patient } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,18 +22,19 @@ type NewPatientFormProps = {
 export function NewPatientForm({ onPatientSaved }: NewPatientFormProps) {
   const router = useRouter();
   const { toast } = useToast();
-  
+  const [loading, setLoading] = useState(false);
+
   // Basic Info
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [alias, setAlias] = useState("");
-  
+
   // Contact
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [contactPreference, setContactPreference] = useState<'phone' | 'email'>("email");
-  
+
   // Consents
   const [consentDataProcessing, setConsentDataProcessing] = useState(false);
   const [consentReminders, setConsentReminders] = useState(false);
@@ -47,60 +49,73 @@ export function NewPatientForm({ onPatientSaved }: NewPatientFormProps) {
   const [referralSource, setReferralSource] = useState("");
 
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !lastName || !phone || !email || !reasonForConsultation || !assignedProfessional) {
+    setLoading(true);
+    try {
+      if (!name || !lastName || !phone || !email || !reasonForConsultation || !assignedProfessional) {
+        toast({
+          title: "Error",
+          description: "Por favor, completa todos los campos obligatorios.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!consentDataProcessing) {
+        toast({
+          title: "Consentimiento Requerido",
+          description: "Debes aceptar el consentimiento de tratamiento de datos.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const newPatient: Patient = {
+        id: crypto.randomUUID(),
+        registrationDate: new Date().toISOString(),
+        // Basic
+        name,
+        lastName,
+        birthDate,
+        alias,
+        // Contact
+        phone,
+        email,
+        contactPreference,
+        // Consents
+        consentDataProcessing: { accepted: consentDataProcessing, date: new Date().toISOString(), documentVersion: '1.0' },
+        consentReminders: { accepted: consentReminders, date: new Date().toISOString() },
+        // Clinical
+        reasonForConsultation,
+        currentRisk,
+        allergies,
+        // Admin
+        assignedProfessional,
+        referralSource
+      };
+
+      await savePatient(newPatient);
+
+      toast({
+        title: "Éxito",
+        description: "Nuevo cliente creado correctamente.",
+      });
+
+      if (onPatientSaved) {
+        onPatientSaved();
+      } else {
+        router.push(`/patients`);
+      }
+    } catch (error: any) {
+      console.error('Error creating patient:', error);
       toast({
         title: "Error",
-        description: "Por favor, completa todos los campos obligatorios.",
+        description: error.message || "Error al crear el cliente. Inténtalo de nuevo.",
         variant: "destructive",
       });
-      return;
-    }
-    
-    if (!consentDataProcessing) {
-      toast({
-        title: "Consentimiento Requerido",
-        description: "Debes aceptar el consentimiento de tratamiento de datos.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newPatient: Patient = {
-      id: crypto.randomUUID(),
-      registrationDate: new Date().toISOString(),
-      // Basic
-      name,
-      lastName,
-      birthDate,
-      alias,
-      // Contact
-      phone,
-      email,
-      contactPreference,
-      // Consents
-      consentDataProcessing: { accepted: consentDataProcessing, date: new Date().toISOString(), documentVersion: '1.0' },
-      consentReminders: { accepted: consentReminders, date: new Date().toISOString() },
-      // Clinical
-      reasonForConsultation,
-      currentRisk,
-      allergies,
-      // Admin
-      assignedProfessional,
-      referralSource
-    };
-
-    savePatient(newPatient);
-    toast({
-      title: "Éxito",
-      description: "Nuevo cliente creado.",
-    });
-
-    if (onPatientSaved) {
-      onPatientSaved();
-    } else {
-      router.push(`/patients`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -241,7 +256,16 @@ export function NewPatientForm({ onPatientSaved }: NewPatientFormProps) {
                 </div>
             </div>
 
-            <Button type="submit" className="w-full !mt-10">Guardar Cliente</Button>
+            <Button type="submit" className="w-full !mt-10" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                'Guardar Cliente'
+              )}
+            </Button>
           </form>
         </CardContent>
       </Card>

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { saveSession } from "@/data/sessions";
-import { getPatients } from "@/data/patients";
+import { saveSession } from "@/actions/sessions";
+import { getPatients } from "@/actions/patients";
 import type { Session, Patient } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,15 +25,29 @@ type NewSessionFormProps = {
 export function NewSessionForm({ initialDate, onSessionCreated, onPatientCreated }: NewSessionFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [loadingPatients, setLoadingPatients] = useState(true);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState<string>("");
   const [sessionDate, setSessionDate] = useState(format(initialDate || new Date(), "yyyy-MM-dd'T'HH:mm"));
   const [duration, setDuration] = useState(50);
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
 
-  const fetchPatients = () => {
-    const allPatients = getPatients();
-    setPatients(allPatients);
+  const fetchPatients = async () => {
+    try {
+      setLoadingPatients(true);
+      const allPatients = await getPatients();
+      setPatients(allPatients);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los pacientes.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPatients(false);
+    }
   }
 
   useEffect(() => {
@@ -57,38 +72,52 @@ export function NewSessionForm({ initialDate, onSessionCreated, onPatientCreated
   }
 
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const patient = patients.find(p => p.id === selectedPatientId);
+    setLoading(true);
 
-    if (!patient || !sessionDate || duration < 1) {
+    try {
+      const patient = patients.find(p => p.id === selectedPatientId);
+
+      if (!patient || !sessionDate || duration < 1) {
+        toast({
+          title: "Error",
+          description: "Por favor, completa todos los campos correctamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const newSession: Session = {
+        id: crypto.randomUUID(),
+        patientId: patient.id,
+        patientName: `${patient.name} ${patient.lastName}`,
+        professionalId: patient.assignedProfessional || "prof1",
+        sessionDate: new Date(sessionDate).toISOString(),
+        duration,
+      };
+
+      await saveSession(newSession);
+
+      toast({
+        title: "Éxito",
+        description: "Nueva sesión creada correctamente.",
+      });
+
+      if (onSessionCreated) {
+        onSessionCreated();
+      } else {
+        router.push(`/sessions/${newSession.id}`);
+      }
+    } catch (error: any) {
+      console.error('Error creating session:', error);
       toast({
         title: "Error",
-        description: "Por favor, completa todos los campos correctamente.",
+        description: error.message || "Error al crear la sesión. Inténtalo de nuevo.",
         variant: "destructive",
       });
-      return;
-    }
-
-    const newSession: Session = {
-      id: crypto.randomUUID(),
-      patientId: patient.id,
-      patientName: `${patient.name} ${patient.lastName}`,
-      professionalId: patient.assignedProfessional || "prof1",
-      sessionDate: new Date(sessionDate).toISOString(),
-      duration,
-    };
-
-    saveSession(newSession);
-    toast({
-      title: "Éxito",
-      description: "Nueva sesión creada.",
-    });
-
-    if (onSessionCreated) {
-      onSessionCreated();
-    } else {
-      router.push(`/sessions/${newSession.id}`);
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -109,9 +138,14 @@ export function NewSessionForm({ initialDate, onSessionCreated, onPatientCreated
                   <div className="space-y-2">
                       <Label htmlFor="patient">Cliente *</Label>
                       <div className="flex gap-2">
-                        <Select value={selectedPatientId} onValueChange={setSelectedPatientId} required>
+                        <Select
+                          value={selectedPatientId}
+                          onValueChange={setSelectedPatientId}
+                          required
+                          disabled={loadingPatients}
+                        >
                           <SelectTrigger id="patient">
-                              <SelectValue placeholder="Selecciona un cliente" />
+                              <SelectValue placeholder={loadingPatients ? "Cargando..." : "Selecciona un cliente"} />
                           </SelectTrigger>
                           <SelectContent>
                               {patients.map(p => (
@@ -119,7 +153,9 @@ export function NewSessionForm({ initialDate, onSessionCreated, onPatientCreated
                               ))}
                           </SelectContent>
                         </Select>
-                        <Button type="button" variant="outline" onClick={() => setIsPatientModalOpen(true)}>Crear Nuevo</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsPatientModalOpen(true)} disabled={loadingPatients}>
+                          Crear Nuevo
+                        </Button>
                       </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -155,7 +191,16 @@ export function NewSessionForm({ initialDate, onSessionCreated, onPatientCreated
                         />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full">Crear Sesión</Button>
+                  <Button type="submit" className="w-full" disabled={loading || loadingPatients}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creando...
+                      </>
+                    ) : (
+                      'Crear Sesión'
+                    )}
+                  </Button>
                   </form>
               </CardContent>
           </Card>

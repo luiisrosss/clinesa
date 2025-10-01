@@ -1,23 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSessions } from "@/data/sessions";
+import { getSessions } from "@/actions/sessions";
 import type { Session } from "@/lib/types";
 import { PageHeader } from "@/components/page-header";
 import { SessionCard } from "@/components/sessions/session-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SessionsPage() {
+  const { toast } = useToast();
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const sortedSessions = getSessions().sort(
-      (a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime()
-    );
-    setSessions(sortedSessions);
-  }, []);
+    const fetchSessions = async () => {
+      try {
+        setLoading(true);
+        const allSessions = await getSessions();
+        const sortedSessions = allSessions.sort(
+          (a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime()
+        );
+        setSessions(sortedSessions);
+      } catch (error) {
+        console.error('Error fetching sessions:', error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar las sesiones.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSessions();
+  }, [toast]);
 
   return (
     <>
@@ -34,7 +54,11 @@ export default function SessionsPage() {
       </PageHeader>
       <div className="p-6 flex-1 overflow-auto">
         <div className="grid gap-4">
-          {sessions.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : sessions.length > 0 ? (
             sessions.map((session) => (
               <SessionCard key={session.id} session={session} />
             ))

@@ -183,6 +183,7 @@ CREATE TABLE sessions (
   -- Archivos
   attachments TEXT[],
   audio_url TEXT,
+  audio_storage_path TEXT, -- Path en Supabase Storage
   audio_duration_seconds INTEGER,
   audio_size_mb NUMERIC(10,2),
 
@@ -486,6 +487,66 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- =====================================================
+-- STORAGE BUCKET CONFIGURATION
+-- =====================================================
+
+-- Crear bucket para audios de sesiones
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'session-audio',
+  'session-audio',
+  false,
+  52428800, -- 50 MB por archivo
+  ARRAY['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/m4a', 'video/mp4']
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- Políticas de Storage para session-audio bucket
+CREATE POLICY "Users can upload their own session audio"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'session-audio' AND
+  (storage.foldername(name))[1] IN (
+    SELECT clerk_user_id::text FROM professionals
+    WHERE clerk_user_id = auth.jwt() ->> 'sub'
+  )
+);
+
+CREATE POLICY "Users can view their own session audio"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'session-audio' AND
+  (storage.foldername(name))[1] IN (
+    SELECT clerk_user_id::text FROM professionals
+    WHERE clerk_user_id = auth.jwt() ->> 'sub'
+  )
+);
+
+CREATE POLICY "Users can update their own session audio"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'session-audio' AND
+  (storage.foldername(name))[1] IN (
+    SELECT clerk_user_id::text FROM professionals
+    WHERE clerk_user_id = auth.jwt() ->> 'sub'
+  )
+);
+
+CREATE POLICY "Users can delete their own session audio"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'session-audio' AND
+  (storage.foldername(name))[1] IN (
+    SELECT clerk_user_id::text FROM professionals
+    WHERE clerk_user_id = auth.jwt() ->> 'sub'
+  )
+);
+
+-- =====================================================
 -- FIN DEL SCHEMA
 -- =====================================================
 --
@@ -495,6 +556,7 @@ $$ LANGUAGE plpgsql;
 -- 3. Copia y pega este archivo completo
 -- 4. Ejecuta (Run)
 -- 5. Verifica que todas las tablas se crearon correctamente
--- 6. Configura las variables de entorno en .env.local
+-- 6. Verifica que el bucket 'session-audio' se creó en Storage
+-- 7. Configura las variables de entorno en .env.local
 --
 -- =====================================================

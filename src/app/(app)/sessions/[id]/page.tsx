@@ -9,13 +9,16 @@ import type { Session } from '@/lib/types';
 
 export default function SessionPage({ params }: { params: { id: string } }) {
   const [session, setSession] = useState<Session | null>(null);
+  const sessionId = params.id;
 
   useEffect(() => {
-    const sessionData = getSessionById(params.id);
-    if(sessionData) {
-      setSession(sessionData);
+    if (sessionId) {
+      const sessionData = getSessionById(sessionId);
+      if(sessionData) {
+        setSession(sessionData);
+      }
     }
-  }, [params.id]);
+  }, [sessionId]);
 
   const title = session
     ? `${session.patientName}`
@@ -23,7 +26,7 @@ export default function SessionPage({ params }: { params: { id: string } }) {
   
   const description = session
     ? `Sesión del ${format(new Date(session.sessionDate), "PPP")}`
-    : `Cargando sesión ID: ${params.id}`;
+    : `Cargando sesión ID: ${sessionId}`;
 
   return (
     <>
@@ -31,7 +34,7 @@ export default function SessionPage({ params }: { params: { id: string } }) {
         title={title}
         description={description}
       />
-      <SessionDetailsClient sessionId={params.id} />
+      <SessionDetailsClient sessionId={sessionId} />
     </>
   );
 }

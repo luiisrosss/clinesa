@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from '@clerk/nextjs';
+import { esES } from '@clerk/localizations';
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Clinesa",
-  description: "Análisis de sesiones con IA para psicólogos",
+  title: "Clinesa - Gestión Inteligente para Psicólogos",
+  description: "Plataforma de gestión de consulta psicológica con IA",
 };
 
 export default function RootLayout({
@@ -13,7 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <ClerkProvider localization={esES}>
+      <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -27,5 +30,6 @@ export default function RootLayout({
         <Toaster />
       </body>
     </html>
+    </ClerkProvider>
   );
 }

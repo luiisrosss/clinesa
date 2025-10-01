@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { SidebarInput } from "@/components/ui/sidebar";
 
 export function SidebarSearch() {
   const router = useRouter();
@@ -61,20 +62,20 @@ export function SidebarSearch() {
 
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-        <div className="relative mt-2">
+        <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <PopoverTrigger asChild>
-                <Input
-                placeholder="Buscar cliente..."
-                className="pl-9 h-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onFocus={() => { if(searchTerm) setIsPopoverOpen(true)}}
+                <SidebarInput
+                  placeholder="Buscar cliente..."
+                  className="pl-9"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={() => { if(searchTerm) setIsPopoverOpen(true)}}
                 />
             </PopoverTrigger>
         </div>
-      <PopoverContent className="w-[238px] p-0" align="start" side="bottom">
-        <div className="divide-y divide-border rounded-lg">
+      <PopoverContent className="w-[238px] p-0" align="start" side="right">
+        <div className="divide-y divide-border rounded-lg bg-card">
             {displayedPatients.length > 0 ? (
             displayedPatients.map((patient) => (
                 <div

@@ -1,8 +1,5 @@
-import AppSidebar from "@/components/app-sidebar";
-import { redirect } from "next/navigation";
-
-// Placeholder for auth check
-const isAuthenticated = true; 
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
+import AppSidebarContent from "@/components/app-sidebar-content";
 
 export default function AppLayout({
   children,
@@ -10,16 +7,17 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
 
-  if (!isAuthenticated) {
-    redirect('/signin');
-  }
-
   return (
-    <div className="flex min-h-screen w-full">
-      <AppSidebar />
-      <main className="flex-1 flex flex-col">
+    <SidebarProvider>
+      <Sidebar>
+        <AppSidebarContent />
+      </Sidebar>
+      <SidebarInset>
+        <div className="p-4">
+            <SidebarTrigger />
+        </div>
         {children}
-      </main>
-    </div>
+        </SidebarInset>
+    </SidebarProvider>
   );
 }

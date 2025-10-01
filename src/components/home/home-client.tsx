@@ -21,12 +21,12 @@ export function HomeClient() {
   useEffect(() => {
     const patients = getPatients();
     setAllPatients(patients);
-    setFilteredPatients(patients); 
   }, []);
 
   useEffect(() => {
     if (searchTerm === "") {
-      setFilteredPatients([]);
+      // Show all patients when search is empty but focused
+      setFilteredPatients(allPatients);
     } else {
       setFilteredPatients(
         allPatients.filter((patient) =>
@@ -44,20 +44,14 @@ export function HomeClient() {
     return `${firstInitial}${lastInitial}`;
   };
 
-  const showResults = isFocused && searchTerm;
+  // Show results if the input is focused.
+  const showResults = isFocused;
+  const displayedPatients = filteredPatients.slice(0, 3);
+  const hasMorePatients = filteredPatients.length > 3;
 
   return (
     <div className="p-6 flex justify-center">
       <div className="w-full max-w-md">
-        <div className="flex gap-4 mb-6">
-          <Button asChild className="w-full">
-            <Link href="/sessions/new">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Nueva Sesión
-            </Link>
-          </Button>
-        </div>
-
         <div className="relative">
           <Card className={`transition-all duration-300 ${showResults ? 'shadow-lg' : ''}`}>
             <CardContent className="p-4">
@@ -74,12 +68,12 @@ export function HomeClient() {
               </div>
 
               {showResults && (
-                <div className="mt-2 space-y-1">
-                  {filteredPatients.length > 0 ? (
-                    filteredPatients.map((patient) => (
+                <div className="mt-2 divide-y divide-border rounded-lg border">
+                  {displayedPatients.length > 0 ? (
+                    displayedPatients.map((patient) => (
                       <Link href={`/patients/${patient.id}`} key={patient.id} passHref>
                         <div
-                          className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary cursor-pointer"
+                          className="flex items-center justify-between p-3 hover:bg-secondary cursor-pointer"
                         >
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8 text-sm">
@@ -94,11 +88,18 @@ export function HomeClient() {
                       </Link>
                     ))
                   ) : (
-                    <>
-                      <p className="p-3 text-sm text-center text-muted-foreground">
-                        No se encontraron clientes.
-                      </p>
-                      <div className="pt-2">
+                    <p className="p-4 text-sm text-center text-muted-foreground">
+                      No se encontraron clientes.
+                    </p>
+                  )}
+                   {hasMorePatients && (
+                     <Link href="/patients">
+                        <div className="p-3 text-sm text-center text-primary hover:bg-secondary cursor-pointer font-medium">
+                            Ver más resultados
+                        </div>
+                     </Link>
+                   )}
+                   <div className="p-2">
                         <Button variant="ghost" className="w-full" asChild>
                            <Link href="/patients/new">
                                <PlusCircle className="mr-2 h-4 w-4" />
@@ -106,8 +107,6 @@ export function HomeClient() {
                            </Link>
                         </Button>
                       </div>
-                    </>
-                  )}
                 </div>
               )}
             </CardContent>

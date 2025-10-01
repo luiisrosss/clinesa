@@ -16,11 +16,11 @@ import {
   SidebarMenuLabel,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Home, Users, PlusCircle, ClipboardList, CalendarDays, Settings, BrainCircuit } from "lucide-react";
+import { Users, PlusCircle, ClipboardList, CalendarDays, Settings, BrainCircuit, LayoutDashboard } from "lucide-react";
 
 
 const navItems = [
-  { href: "/dashboard", icon: Home, label: "Home" },
+  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/patients", icon: Users, label: "Clientes" },
   { href: "/sessions", icon: ClipboardList, label: "Sesiones" },
   { href: "/calendar", icon: CalendarDays, label: "Calendario" },
@@ -33,7 +33,6 @@ const secondaryNavItems = [
 export default function AppSidebarContent() {
   const pathname = usePathname();
   const [isNewEntryDialogOpen, setIsNewEntryDialogOpen] = useState(false);
-  const { state: sidebarState } = useSidebar();
 
 
   return (
@@ -56,7 +55,7 @@ export default function AppSidebarContent() {
             </SidebarMenuItem>
              <SidebarMenuItem>
                 <SidebarMenuButton onClick={() => setIsNewEntryDialogOpen(true)} tooltip="Nueva Nota">
-                    <PlusCircle className="h-5 w-5" />
+                    <PlusCircle className="h-5 w-5 flex-shrink-0" />
                     <SidebarMenuLabel>Nueva Nota</SidebarMenuLabel>
                 </SidebarMenuButton>
             </SidebarMenuItem>
@@ -70,7 +69,7 @@ export default function AppSidebarContent() {
                     isActive={pathname.startsWith(item.href)}
                     tooltip={item.label}
                   >
-                    <item.icon className="h-5 w-5" />
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
                     <SidebarMenuLabel>{item.label}</SidebarMenuLabel>
                   </SidebarMenuButton>
                 </Link>
@@ -89,7 +88,7 @@ export default function AppSidebarContent() {
                             isActive={pathname.startsWith(item.href)}
                             tooltip={item.label}
                         >
-                            <item.icon className="h-5 w-5" />
+                            <item.icon className="h-5 w-5 flex-shrink-0" />
                             <SidebarMenuLabel>{item.label}</SidebarMenuLabel>
                         </SidebarMenuButton>
                         </Link>

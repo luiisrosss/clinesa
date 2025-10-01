@@ -16,7 +16,7 @@ import {
   SidebarMenuLabel,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Home, Users, PlusCircle, ClipboardList, CalendarDays, Settings, LifeBuoy, BrainCircuit } from "lucide-react";
+import { Home, Users, PlusCircle, ClipboardList, CalendarDays, Settings, BrainCircuit } from "lucide-react";
 
 
 const navItems = [
@@ -28,7 +28,6 @@ const navItems = [
 
 const secondaryNavItems = [
     { href: "/settings", icon: Settings, label: "Ajustes" },
-    { href: "/support", icon: LifeBuoy, label: "Soporte" },
 ];
 
 export default function AppSidebarContent() {
@@ -57,7 +56,7 @@ export default function AppSidebarContent() {
             </SidebarMenuItem>
              <SidebarMenuItem>
                 <SidebarMenuButton onClick={() => setIsNewEntryDialogOpen(true)} tooltip="Nueva Nota">
-                    <PlusCircle />
+                    <PlusCircle className="h-5 w-5" />
                     <SidebarMenuLabel>Nueva Nota</SidebarMenuLabel>
                 </SidebarMenuButton>
             </SidebarMenuItem>
@@ -71,7 +70,7 @@ export default function AppSidebarContent() {
                     isActive={pathname.startsWith(item.href)}
                     tooltip={item.label}
                   >
-                    <item.icon />
+                    <item.icon className="h-5 w-5" />
                     <SidebarMenuLabel>{item.label}</SidebarMenuLabel>
                   </SidebarMenuButton>
                 </Link>
@@ -90,7 +89,7 @@ export default function AppSidebarContent() {
                             isActive={pathname.startsWith(item.href)}
                             tooltip={item.label}
                         >
-                            <item.icon />
+                            <item.icon className="h-5 w-5" />
                             <SidebarMenuLabel>{item.label}</SidebarMenuLabel>
                         </SidebarMenuButton>
                         </Link>

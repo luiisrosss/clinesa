@@ -4,47 +4,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { CheckCircle, BarChart, Mic, BrainCircuit, Users, Clock, Zap } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { LandingHeader } from "@/components/landing/landing-header";
+import { LandingHero } from "@/components/landing/landing-hero";
+import { LandingFeatures } from "@/components/landing/landing-features";
+import { LandingCta } from "@/components/landing/landing-cta";
+import { LandingTestimonials } from "@/components/landing/landing-testimonials";
+import { LandingPricing } from "@/components/landing/landing-pricing";
+import { LandingFaq } from "@/components/landing/landing-faq";
+import { LandingFooter } from "@/components/landing/landing-footer";
 
 export default function SignInPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader className="text-center">
-            <div className="mb-4 flex justify-center">
-                <AppLogo />
-            </div>
-          <CardTitle className="text-2xl font-bold">Inicia Sesión</CardTitle>
-          <CardDescription>
-            Introduce tu email para acceder a tu panel.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input id="password" type="password" required />
-            </div>
-            <Button type="submit" className="w-full" asChild>
-                <Link href="/dashboard">Entrar</Link>
-            </Button>
-          </div>
-          <div className="mt-4 text-center text-sm">
-            ¿No tienes una cuenta?{" "}
-            <Link href="#" className="underline">
-              Regístrate
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col min-h-screen bg-background">
+      <LandingHeader />
+      <main className="flex-1">
+        <LandingHero />
+        <LandingFeatures />
+        <LandingCta />
+        <LandingTestimonials />
+        <LandingPricing />
+        <LandingFaq />
+      </main>
+      <LandingFooter />
     </div>
   );
 }

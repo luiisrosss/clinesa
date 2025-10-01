@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Mindscribe",
-  description: "AI-powered session analysis for psychologists",
+  title: "Clinesa",
+  description: "Análisis de sesiones con IA para psicólogos",
 };
 
 export default function RootLayout({

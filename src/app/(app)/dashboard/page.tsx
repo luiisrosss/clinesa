@@ -34,7 +34,7 @@ export default function DashboardPage() {
               </Button>
             </div>
             <p className="text-sm text-muted-foreground mt-6">
-              Mindscribe helps you focus on your patients by automating transcription and providing AI-powered insights into your sessions.
+              Clinesa helps you focus on your patients by automating transcription and providing AI-powered insights into your sessions.
             </p>
           </CardContent>
         </Card>

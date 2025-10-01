@@ -1,6 +1,9 @@
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import AppSidebarContent from "@/components/app-sidebar-content";
 
+// Forzar renderizado dinámico (no prerender durante build)
+export const dynamic = 'force-dynamic';
+
 export default function AppLayout({
   children,
 }: {

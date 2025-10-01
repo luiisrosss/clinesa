@@ -1,9 +1,11 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { supabaseAdmin, validateSupabaseConfig } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   try {
+    validateSupabaseConfig();
+
     const { userId } = await auth();
 
     if (!userId) {

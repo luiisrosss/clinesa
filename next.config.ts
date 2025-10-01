@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Desactivar generación estática para páginas que requieren auth
+  output: 'standalone',
   images: {
     remotePatterns: [
       {

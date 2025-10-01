@@ -26,7 +26,7 @@ export function HomeClient() {
 
   useEffect(() => {
     if (searchTerm === "") {
-      setFilteredPatients(allPatients);
+      setFilteredPatients([]);
     } else {
       setFilteredPatients(
         allPatients.filter((patient) =>
@@ -44,6 +44,8 @@ export function HomeClient() {
     return `${firstInitial}${lastInitial}`;
   };
 
+  const showResults = isFocused && searchTerm;
+
   return (
     <div className="p-6 flex justify-center">
       <div className="w-full max-w-md">
@@ -57,7 +59,7 @@ export function HomeClient() {
         </div>
 
         <div className="relative">
-          <Card className={`transition-all duration-300 ${isFocused || searchTerm ? 'shadow-lg' : ''}`}>
+          <Card className={`transition-all duration-300 ${showResults ? 'shadow-lg' : ''}`}>
             <CardContent className="p-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -71,7 +73,7 @@ export function HomeClient() {
                 />
               </div>
 
-              {(isFocused || searchTerm) && (
+              {showResults && (
                 <div className="mt-2 space-y-1">
                   {filteredPatients.length > 0 ? (
                     filteredPatients.map((patient) => (
@@ -92,18 +94,20 @@ export function HomeClient() {
                       </Link>
                     ))
                   ) : (
-                    <p className="p-3 text-sm text-center text-muted-foreground">
-                      No se encontraron clientes.
-                    </p>
+                    <>
+                      <p className="p-3 text-sm text-center text-muted-foreground">
+                        No se encontraron clientes.
+                      </p>
+                      <div className="pt-2">
+                        <Button variant="ghost" className="w-full" asChild>
+                           <Link href="/patients/new">
+                               <PlusCircle className="mr-2 h-4 w-4" />
+                               Crear nuevo cliente
+                           </Link>
+                        </Button>
+                      </div>
+                    </>
                   )}
-                   <div className="pt-2">
-                     <Button variant="ghost" className="w-full" asChild>
-                        <Link href="/patients/new">
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Crear nuevo cliente
-                        </Link>
-                     </Button>
-                   </div>
                 </div>
               )}
             </CardContent>

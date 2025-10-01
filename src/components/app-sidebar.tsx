@@ -8,7 +8,7 @@ import { Home, Users, PlusCircle, ClipboardList } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const navItems = [
-  { href: "/home", icon: Home, label: "Home" },
+  { href: "/dashboard", icon: Home, label: "Home" },
   { href: "/patients", icon: Users, label: "Clientes" },
   { href: "/sessions", icon: ClipboardList, label: "Sesiones" },
 ];

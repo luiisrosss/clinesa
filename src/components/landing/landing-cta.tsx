@@ -10,7 +10,7 @@ export function LandingCta() {
           Deja que la inteligencia artificial se encargue del trabajo pesado y dedica más tiempo a lo que realmente importa: tus clientes.
         </p>
         <Button size="lg" asChild>
-          <Link href="/home">Empieza Gratis</Link>
+          <Link href="/dashboard">Empieza Gratis</Link>
         </Button>
       </div>
     </section>

@@ -16,7 +16,7 @@ export function LandingPricing() {
         "Soporte por email"
       ],
       cta: "Empieza Gratis",
-      href: "/home"
+      href: "/dashboard"
     },
     {
       name: "Profesional",
@@ -30,7 +30,7 @@ export function LandingPricing() {
         "Soporte prioritario"
       ],
       cta: "Elige Profesional",
-      href: "/home",
+      href: "/dashboard",
       popular: true
     },
      {

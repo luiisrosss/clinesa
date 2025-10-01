@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
 export default function Home() {
-  redirect('/dashboard');
+  // Redirect to signin by default, AppLayout will handle authenticated users.
+  redirect('/signin');
 }
